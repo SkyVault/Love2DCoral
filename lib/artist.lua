@@ -20,6 +20,14 @@ return function(enum, sys, tools)
     return res
   end
 
+  local function draw(p, x, y, w, h)
+    p.x = x or p.x
+    p.y = y or p.y
+    p.w = w or p.w
+    p.h = h or p.h
+    table.insert(pics, p)
+  end
+
   local function rect(x, y, w, h)
     return pic(kinds.rectangle, x, y, w, h)
   end
@@ -36,7 +44,7 @@ return function(enum, sys, tools)
     return pic(kinds.line_circle, x, y, r * 2, r * 2)
   end
 
-  local function draw()
+  local function final_draw()
     table.sort(pics, function(a, b)
       return a.layer < b.layer
     end)
@@ -73,9 +81,15 @@ return function(enum, sys, tools)
     pics = {}
   end
 
-  sys.on_draw(draw, -1)
+  sys.on_load(function()
+    love.graphics.setDepthMode("lequal", true)
+  end)
+
+  sys.on_draw(final_draw, -1)
 
   return {
+    kinds = kinds,
+    draw = draw,
     pic = pic,
     rect = rect,
     line_rect = line_rect,

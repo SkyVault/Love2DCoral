@@ -23,6 +23,7 @@ return function(base_path, love)
   local records = _require("lib.record")(pp)
   local sys = _require("lib.systems")
   local enums = _require("lib.enums")
+  local actors = _require("lib.actors")(tools)
   local art = _require("lib.artist")(enums.enum, sys, tools)
 
   local coral = records.record("Coral") {
@@ -33,6 +34,7 @@ return function(base_path, love)
     sys = sys,
     art = art,
     tools = tools,
+    actors = actors,
 
     print = pp.pprint,
     format = pp.pformat,

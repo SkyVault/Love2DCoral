@@ -1,27 +1,30 @@
 local Coral = require("coral")(nil, love)
 
-local ds = {
-  { Coral.art.rect,         Coral.palette.next_bright_color(), 1 },
-  { Coral.art.line_rect,    Coral.palette.next_bright_color(), 1 },
-  { Coral.art.circle,       Coral.palette.next_bright_color(), 1 },
-  { Coral.art.line_circle,  Coral.palette.next_bright_color(), 1 },
-  { Coral.art.rect,         Coral.palette.next_bright_color(), 1 },
-  { Coral.art.line_rect,    Coral.palette.next_bright_color(), 1 },
-  { Coral.art.circle,       Coral.palette.next_bright_color(), 1 },
-  { Coral.art.line_circle,  Coral.palette.next_bright_color(), 1 },
+local Spatial = Coral.actors.component("Spatial") {
+  x = 0,
+  y = 0,
+  w = 100,
+  h = 100,
 }
 
-Coral.sys.on_draw(function()
-  for i = 1, #ds do
-    ds[i][1](i * 20, i * 20, 10, 10):color_(ds[i][2]):layer_(ds[i][3])
-  end
+local Drawable = Coral.actors.component("Drawable") {
+  pic = Coral.art.pic(Coral.art.kinds.rectangle, 10, 10, 100, 100),
+}
+
+Coral.sys.on_load(function()
+  local player = Coral.actors.actor(
+    Spatial:new { x = 32, y = 200 },
+    Drawable:new { }
+  )
+
+  Coral.actors.spawn(player)
 end)
 
-function love.load()
-end
+Coral.sys.on_update(function()
+end)
 
-function love.update(_)
-end
-
-function love.draw()
-end
+Coral.sys.on_draw(function()
+  Coral.actors.each({ Spatial, Drawable }, function(_, spatial, drawable)
+    Coral.art.draw(drawable.pic, spatial.x, spatial.y, spatial.w, spatial.h)
+  end)
+end)
