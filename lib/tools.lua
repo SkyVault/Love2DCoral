@@ -1,4 +1,4 @@
-local Pp = require "lib.pprint"
+local Pp = _coral_require_ "lib.pprint"
 
 function ext(a, b)
   setmetatable(a, getmetatable(b))
@@ -40,7 +40,7 @@ local function new(name)
   end
 end
 
-local function init(tbl)
+local function construct(tbl)
   assert(tbl._name_)
   local r = records[tbl._name_]
   assert(r)
@@ -51,7 +51,7 @@ end
 
 local function record(name)
   return function(tbl)
-    local r =  ext(tbl, setmetatable({
+    local r = ext(tbl, setmetatable({
       _name_ = name,
       _ctor_ = function(t)
         assert(t._name_ ~= nil)
@@ -67,6 +67,10 @@ local function record(name)
       end,
     }))
 
+    if name =="Coral" then
+      print(r.sys.internal.update)
+    end
+
     records[r._name_] = r
 
     return r
@@ -77,6 +81,6 @@ return {
   expect = expect,
   record = record,
   walk = walk,
-  init = init,
+  construct = construct,
   new = new,
 }
