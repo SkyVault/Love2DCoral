@@ -1,5 +1,3 @@
-require "lib.neum"
-
 local actors = {}
 local actors_by_id = {}
 local views = {}

@@ -1,6 +1,18 @@
-local Sys = require "lib.systems"
-local Pp = require "lib.pprint"
-local Tools = require "lib.tools"
+function use(loc)
+  local b = _G['coral_base_path']
+  if b ~= "" then
+    loc = b .. "." .. loc
+  end
+  return require(loc)
+end
+
+_G['coral_base_path'] = ""
+
+local Sys = use("lib.systems")
+local Pp = use("lib.pprint")
+local Tools = use("lib.tools")
+
+print("SYS: ", Sys)
 
 local record = Tools.record
 
