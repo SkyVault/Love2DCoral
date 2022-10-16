@@ -17,7 +17,7 @@ return function(base_path, love)
     return try_require(loc) or try_require("lib.Coral." .. loc) or try_require("Coral." .. loc)
   end
 
-  _require("lib.maths")
+  require("lib.maths")
 
   local palette = _require("lib.palette")
   local pp = _require("lib.pprint")

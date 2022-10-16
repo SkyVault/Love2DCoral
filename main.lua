@@ -33,6 +33,6 @@ end)
 
 Coral.sys.on_draw(function()
   Coral.actors.each({ Spatial, Drawable }, function(_, spatial, drawable)
-    Coral.art.draw(drawable.pic, spatial.x, spatial.y, spatial.w, spatial.h)
+    --Coral.art.draw(drawable.pic, spatial.x, spatial.y, spatial.w, spatial.h)
   end)
 end)
