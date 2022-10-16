@@ -1,3 +1,6 @@
+local fmt = string.format
+
+---@diagnostic disable-next-line: redefined-local
 local vertex_format = {
   {"VertexPosition", "float", 3},
   --{"VertexTexCoord", "float", 2},
@@ -26,12 +29,13 @@ vec4 position(mat4 transform_projection, vec4 vertex_pos) {
 ]]
 
 return function(love, enum, sys, tools)
+  local pics_3d = {}
   local pics = {}
+
   local shader_3d = nil
   local plane_mesh = nil
 
   local scale = v3(1, 1, 1)
-  local rot = 0
 
   local model_transform = {
     translation = v3(0, 0, 0),
@@ -44,9 +48,10 @@ return function(love, enum, sys, tools)
     "line_rectangle",
     "circle",
     "line_circle",
+    "plane",
   }
 
-  local function plane(s, x, y, z)
+  local function plane_vertices(s, x, y, z)
     x, y, z = x or 0, y or 0, z or 0
     return {
       { x + -s, y + -s, z },
@@ -70,6 +75,25 @@ return function(love, enum, sys, tools)
       layer = 0
     }
     table.insert(pics, res)
+    return res
+  end
+
+  local function tkey(t, r, s)
+    return fmt("%f%f%f%f%f%f%f%f%f",t.x,t.y,t.z,r.x,r.y,r.z,s.x,s.y,s.z)
+  end
+
+  local transform_cache = {}
+
+  local function pic3d(kind, translation, rotation, scle)
+    local t = m4_transform(translation, rotation, scle)
+
+    local res = tools.builder {
+      kind = kind,
+      transform = t,
+      color = {1, 1, 1, 1},
+    }
+
+    table.insert(pics_3d, res)
     return res
   end
 
@@ -97,9 +121,13 @@ return function(love, enum, sys, tools)
     return pic(kinds.line_circle, x, y, r * 2, r * 2)
   end
 
+  local function plane(translation, rotation, scle)
+    return pic3d(kinds.plane, translation, rotation, scle)
+  end
+
   local mesh = {
     verts = {
-      plane = plane,
+      plane = plane_vertices,
     },
   }
 
@@ -116,24 +144,42 @@ return function(love, enum, sys, tools)
   end
 
   local function final_draw()
-    model_transform.rotation.y = rot
-
-    local model_matrix = m4_transform(
-      model_transform.translation,
-      model_transform.rotation,
-      model_transform.scale
-    )
-
     table.sort(pics, function(a, b)
       return a.layer < b.layer
     end)
 
     local init_color = { love.graphics.getColor() }
 
+    love.graphics.setShader(shader_3d)
+
+    local cam_pos = v3(0, 0, 2)
+    local target = v3(0, 0, 0)
+    local aspect = love.graphics.getWidth() / love.graphics.getHeight()
+
+    shader_3d:send("view", m4_view(cam_pos, target, v3(0, 1, 0)).m)
+    shader_3d:send("projection", m4_projection(45.0, 0.001, 100.0, aspect).m)
+
+    for i = 1, #pics_3d do
+      local p = pics_3d[i]
+
+      kinds.case(p.kind) {
+        [kinds.plane] = function()
+          love.graphics.setColor(p.color)
+
+          local t = p.transform
+          shader_3d:send("model", t.m)
+
+          love.graphics.draw(mesh.plane)
+        end,
+      }
+    end
+
+    love.graphics.setShader()
+
     for i = 1, #pics do
       local p = pics[i]
 
-      kinds.match(p.kind) {
+      kinds.case(p.kind) {
         [kinds.rectangle] = function()
           love.graphics.setColor(p.color)
           love.graphics.rectangle("fill", p.x, p.y, p.w, p.h)
@@ -158,28 +204,14 @@ return function(love, enum, sys, tools)
 
     love.graphics.setColor(init_color)
 
-    love.graphics.setShader(shader_3d)
-    shader_3d:send("model", model_matrix.m)
-
-    local cam_pos = v3(0, 0, 2)
-    local target = v3(0, 0, 0) -- cam_pos + v3(0, 0, 1)
-
-    shader_3d:send("view", m4_view(cam_pos, target, v3(0, 1, 0)).m)
-
-    local aspect = love.graphics.getWidth() / love.graphics.getHeight()
-
-    shader_3d:send("projection", m4_projection(45.0, 0.001, 100.0, aspect).m)
-    love.graphics.draw(mesh.plane)
-    love.graphics.setShader()
-
     pics = {}
+    pics_3d = {}
   end
 
   sys.on_load(load)
-
   sys.on_draw(final_draw, -1)
+
   sys.on_update(function(dt)
-    rot = rot + dt
   end)
 
   return {
@@ -190,6 +222,7 @@ return function(love, enum, sys, tools)
     line_rect = line_rect,
     circle = circle,
     line_circle = line_circle,
+    plane = plane,
 
     mesh = mesh,
   }
