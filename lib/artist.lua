@@ -1,4 +1,4 @@
-return function(enum, sys, tools)
+return function(love, enum, sys, tools)
   local pics = {}
 
   local kinds = enum {

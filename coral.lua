@@ -17,6 +17,8 @@ return function(base_path, love)
     return try_require(loc) or try_require("lib.Coral." .. loc) or try_require("Coral." .. loc)
   end
 
+  _require("lib.maths")
+
   local palette = _require("lib.palette")
   local pp = _require("lib.pprint")
   local tools = _require("lib.tools")
@@ -24,7 +26,7 @@ return function(base_path, love)
   local sys = _require("lib.systems")
   local enums = _require("lib.enums")
   local actors = _require("lib.actors")(tools)
-  local art = _require("lib.artist")(enums.enum, sys, tools)
+  local art = _require("lib.artist")(love, enums.enum, sys, tools)
 
   local coral = records.record("Coral") {
     record = records.record,
