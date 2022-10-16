@@ -1,4 +1,4 @@
-local Coral = require("coral")()
+local Coral = require("coral")(nil, love)
 
 local ds = {
   { Coral.art.rect,         Coral.palette.next_bright_color(), 1 },
@@ -18,13 +18,10 @@ Coral.sys.on_draw(function()
 end)
 
 function love.load()
-  Coral:load()
 end
 
-function love.update(dt)
-  Coral:update(dt)
+function love.update(_)
 end
 
 function love.draw()
-  Coral:draw()
 end

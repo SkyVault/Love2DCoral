@@ -35,13 +35,13 @@ Pink = hex "0xFF77A8FF"
 Tan = hex "0xFFCCAAFF"
 
 local function mix_color(a, b, strength)
-    local s = strength or 0.5
-    return {
-        a[1] * (1 - s) + b[1] * s,
-        a[2] * (1 - s) + b[2] * s,
-        a[3] * (1 - s) + b[3] * s,
-        a[4] * (1 - s) + b[4] * s,
-    }
+  local s = strength or 0.5
+  return {
+    a[1] * (1 - s) + b[1] * s,
+    a[2] * (1 - s) + b[2] * s,
+    a[3] * (1 - s) + b[3] * s,
+    a[4] * (1 - s) + b[4] * s,
+  }
 end
 
 local colors = {

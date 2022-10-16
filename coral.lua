@@ -1,4 +1,8 @@
-return function(base_path)
+return function(base_path, love)
+  love = love or _G["love"]
+
+  assert(love, "Missing love")
+
   local function _require(loc)
     local b = base_path or ""
     if b ~= "" then
@@ -45,6 +49,46 @@ return function(base_path)
   function coral:draw()
     self.sys.internal.draw()
   end
+
+  local ks = {}
+  for k, _ in pairs(love) do
+    table.insert(ks, k)
+  end
+
+  local _love = {}
+
+  love.load = function()
+    coral:load()
+
+    if _love.load then
+      _love.load()
+    end
+  end
+
+  love.update = function(dt)
+    coral:update(dt)
+
+    if _love.update then
+      _love.update(dt)
+    end
+  end
+
+  love.draw = function()
+    coral:draw()
+
+    if _love.draw then
+      _love.draw()
+    end
+  end
+
+  _G["love"] = _love
+  for i = 1, #ks do
+    _G["love"][ks[i]] = love[ks[i]]
+  end
+
+  -- in the very rare case that the user adds a metatable to the love object,
+  -- a usecase would be to spy on what is getting called or something.
+  setmetatable(_G["love"], getmetatable(love))
 
   return coral
 end
