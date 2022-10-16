@@ -1,3 +1,22 @@
+local function hex(c)
+    -- strip leading "#" or "0x" if necessary
+    if c:sub(1, 1) == "#" then
+      c = c:sub(2)
+    elseif c:sub(1, 2) == "0x" then
+      c = c:sub(3)
+    end
+
+    local color = {}
+    local color_width = (#c < 6) and 1 or 2
+    local max_val = 16 ^ color_width - 1
+
+    for i = 1, #c, color_width do
+        color[#color + 1] = tonumber(c:sub(i, i + color_width - 1), 16) / max_val
+    end
+
+    return color
+end
+
 Black = hex "0x000000FF"
 DarkBlue = hex "0x1D2B53FF"
 Maroon = hex "0x7E2553FF"
@@ -15,7 +34,7 @@ Gray = hex "0x83769CFF"
 Pink = hex "0xFF77A8FF"
 Tan = hex "0xFFCCAAFF"
 
-function mix_color(a, b, strength)
+local function mix_color(a, b, strength)
     local s = strength or 0.5
     return {
         a[1] * (1 - s) + b[1] * s,
@@ -24,3 +43,48 @@ function mix_color(a, b, strength)
         a[4] * (1 - s) + b[4] * s,
     }
 end
+
+local colors = {
+  Black, DarkBlue, Maroon, DarkGreen,
+  Brown, DarkGray, LightGray, White,
+  Red, Orange, Yellow, Green, Blue,
+  Gray, Pink, Tan,
+}
+
+local bright_colors = {
+  Maroon, Brown, White, Red, Orange, Yellow, Green, Blue, Gray, Pink, Tan,
+}
+
+local bright_index = 1
+
+local function next_bright_color()
+  local c = bright_colors[bright_index]
+  bright_index = bright_index + 1
+  if bright_index > #bright_colors then bright_index = 1 end
+  return c
+end
+
+return {
+  mix_color = mix_color,
+  next_bright_color = next_bright_color,
+  hex = hex,
+
+  black = Black,
+  dark_blue = DarkBlue,
+  maroon = Maroon,
+  dark_green = DarkGreen,
+  brown = Brown,
+  dark_gray = DarkGray,
+  light_gray = LightGray,
+  white = White,
+  red = Red,
+  orange = Orange,
+  yellow = Yellow,
+  green = Green,
+  blue = Blue,
+  gray = Gray,
+  pink = Pink,
+  tan = Tan,
+
+  colors = colors,
+}
