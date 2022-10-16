@@ -37,6 +37,7 @@ return function(base_path, love)
     art = art,
     tools = tools,
     actors = actors,
+    enums = enums,
 
     print = pp.pprint,
     format = pp.pformat,
