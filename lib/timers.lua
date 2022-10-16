@@ -1,17 +1,26 @@
-local timers = {}
 
-function timer(timout, callback)
-    table.insert(timers, { timout, callback })
-end
+return function(sys)
+  local timers = {
+    ts = {}
+  }
 
-OnUpdate(function(dt)
-    for i = 1, #timers do
-        timers[i][1] = timers[i][1] - dt
+  function timers.timer(timeout, callback)
+    local t = { timeout = timeout, callback = callback }
+    table.insert(timers.ts, t)
+    return t
+  end
 
-        if timers[i][1] <= 0 then
-            timers[i][2]()
-            table.remove(timers, i)
-            return
-        end
+  sys.on_update(function(dt)
+    for i = 1, #timers.ts do
+      timers.ts[i].timeout = timers.ts[i].timeout - dt
+
+      if timers.ts[i].timeout <= 0 then
+        timers.ts[i].callback()
+        table.remove(timers.ts, i)
+        return
+      end
     end
-end)
+  end, -1)
+
+  return timers
+end

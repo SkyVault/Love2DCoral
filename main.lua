@@ -16,6 +16,16 @@ Coral.sys.on_load(function()
   )
 
   Coral.actors.spawn(player)
+
+  Coral.timer(1, function()
+    print("ONE")
+    Coral.timer(1, function()
+      print("TWO")
+      Coral.timer(1, function()
+        print("THREE")
+      end)
+    end)
+  end)
 end)
 
 Coral.sys.on_update(function()

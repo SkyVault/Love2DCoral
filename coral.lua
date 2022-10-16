@@ -27,6 +27,7 @@ return function(base_path, love)
   local enums = _require("lib.enums")
   local actors = _require("lib.actors")(tools)
   local art = _require("lib.artist")(love, enums.enum, sys, tools)
+  local timers = _require("lib.timers")(sys)
 
   local coral = records.record("Coral") {
     record = records.record,
@@ -38,9 +39,11 @@ return function(base_path, love)
     tools = tools,
     actors = actors,
     enums = enums,
+    timers = timers,
 
     print = pp.pprint,
     format = pp.pformat,
+    timer = timers.timer,
   }
 
   function coral:load()
