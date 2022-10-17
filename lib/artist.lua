@@ -1,4 +1,5 @@
 local fmt = string.format
+local atan, cos, sin = math.atan, math.cos, math.sin
 
 ---@diagnostic disable-next-line: redefined-local
 local vertex_format = {
@@ -135,7 +136,7 @@ return function(love, enum, sys, tools, camera)
 
     mesh.plane = love.graphics.newMesh(
       vertex_format,
-      mesh.verts.plane(1),
+      mesh.verts.plane(2),
       "fan"
     )
   end
@@ -153,31 +154,6 @@ return function(love, enum, sys, tools, camera)
     love.graphics.setShader(shader_3d)
 
     camera:look_in_direction(camera.position, camera.yaw, camera.pitch)
-
-    -- temp
-    if love.keyboard.isDown("s") then
-      camera.position.y = camera.position.y + 0.01
-    end
-
-    if love.keyboard.isDown("w") then
-      camera.position.y = camera.position.y - 0.01
-    end
-
-    if love.keyboard.isDown("a") then
-      camera.position.x = camera.position.x - 0.01
-    end
-
-    if love.keyboard.isDown("d") then
-      camera.position.x = camera.position.x + 0.01
-    end
-
-    if love.keyboard.isDown("-") then
-      camera.position.z = camera.position.z + 0.01
-    end
-
-    if love.keyboard.isDown("=") then
-      camera.position.z = camera.position.z - 0.01
-    end
 
     shader_3d:send("view", camera.view.m)
     shader_3d:send("projection", camera.projection.m)
@@ -235,9 +211,35 @@ return function(love, enum, sys, tools, camera)
   sys.on_draw(final_draw, -1)
 
   sys.on_update(function(dt)
-    if love.keyboard.isDown("left") then
-      cam_pos.x = cam_pos.x - dt
-      target = v3(cam_pos.x, cam_pos.y, cam_pos.z)
+    if love.keyboard.isDown("e")  then
+      camera.yaw = camera.yaw - dt
+    end
+
+    if love.keyboard.isDown("q")  then
+      camera.yaw = camera.yaw + dt
+    end
+
+    local mx, my = 0, 0
+
+    if love.keyboard.isDown("s") then my = my - 1 end
+    if love.keyboard.isDown("w") then my = my + 1 end
+    if love.keyboard.isDown("a") then mx = mx - 1 end
+    if love.keyboard.isDown("d") then mx = mx + 1 end
+
+    if mx ~= 0 or my ~= 0 then
+      local a = atan(my, mx)
+      local d = camera.yaw - math.pi/4
+      local dx, dy = cos(d + a) * dt, sin(d + a) * dt
+      camera.position.x = camera.position.x + dx
+      camera.position.y = camera.position.y + dy
+    end
+
+    if love.keyboard.isDown("-") then
+      camera.position.z = camera.position.z + dt
+    end
+
+    if love.keyboard.isDown("=") then
+      camera.position.z = camera.position.z - dt
     end
   end)
 

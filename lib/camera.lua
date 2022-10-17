@@ -10,14 +10,14 @@ return function(love, record)
     near = 0.01,
     far = 1000,
     aspect = aspect,
-    position = v3(0, -2, 1),
+    position = v3(-2, 0, 1),
     target = v3(1, 0, 0),
     up = v3(0, 0, 1),
 
     view = m4(),
     projection = m4_projection(45.0, 0.0001, 1000.0, aspect),
 
-    yaw = math.pi/2,
+    yaw = 0, -- math.pi/2,
     pitch = 0.0,
 
     yaw_and_pitch = function(self)
