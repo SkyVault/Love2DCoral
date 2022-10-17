@@ -23,10 +23,14 @@ return function(base_path, love)
   local pp = _require("lib.pprint")
   local tools = _require("lib.tools")
   local records = _require("lib.record")(pp)
+  local camera = _require("lib.camera")(love, records.record)
+
+  local game_camera = camera:new {  }
+
   local sys = _require("lib.systems")
   local enums = _require("lib.enums")
   local actors = _require("lib.actors")(tools)
-  local art = _require("lib.artist")(love, enums.enum, sys, tools)
+  local art = _require("lib.artist")(love, enums.enum, sys, tools, game_camera)
   local timers = _require("lib.timers")(sys)
 
   local coral = records.record("Coral") {
@@ -40,6 +44,7 @@ return function(base_path, love)
     actors = actors,
     enums = enums,
     timers = timers,
+    camera = game_camera,
 
     print = pp.pprint,
     format = pp.pformat,

@@ -28,20 +28,17 @@ vec4 position(mat4 transform_projection, vec4 vertex_pos) {
 }
 ]]
 
-return function(love, enum, sys, tools)
+return function(love, enum, sys, tools, camera)
   local pics_3d = {}
   local pics = {}
 
   local shader_3d = nil
-  local plane_mesh = nil
 
   local scale = v3(1, 1, 1)
 
-  local model_transform = {
-    translation = v3(0, 0, 0),
-    rotation = v3(0, 0, 0),
-    scale = v3(1, 1, 1),
-  }
+  local cam_pos = v3(0, 0, 2)
+  local target = v3(0, 0, 0)
+  local aspect = love.graphics.getWidth() / love.graphics.getHeight()
 
   local kinds = enum {
     "rectangle",
@@ -143,7 +140,10 @@ return function(love, enum, sys, tools)
     )
   end
 
+  local x = 0
+
   local function final_draw()
+    x = x + 0.01
     table.sort(pics, function(a, b)
       return a.layer < b.layer
     end)
@@ -152,12 +152,35 @@ return function(love, enum, sys, tools)
 
     love.graphics.setShader(shader_3d)
 
-    local cam_pos = v3(0, 0, 2)
-    local target = v3(0, 0, 0)
-    local aspect = love.graphics.getWidth() / love.graphics.getHeight()
+    camera:look_in_direction(camera.position, camera.yaw, camera.pitch)
 
-    shader_3d:send("view", m4_view(cam_pos, target, v3(0, 1, 0)).m)
-    shader_3d:send("projection", m4_projection(45.0, 0.001, 100.0, aspect).m)
+    -- temp
+    if love.keyboard.isDown("s") then
+      camera.position.y = camera.position.y + 0.01
+    end
+
+    if love.keyboard.isDown("w") then
+      camera.position.y = camera.position.y - 0.01
+    end
+
+    if love.keyboard.isDown("a") then
+      camera.position.x = camera.position.x - 0.01
+    end
+
+    if love.keyboard.isDown("d") then
+      camera.position.x = camera.position.x + 0.01
+    end
+
+    if love.keyboard.isDown("-") then
+      camera.position.z = camera.position.z + 0.01
+    end
+
+    if love.keyboard.isDown("=") then
+      camera.position.z = camera.position.z - 0.01
+    end
+
+    shader_3d:send("view", camera.view.m)
+    shader_3d:send("projection", camera.projection.m)
 
     for i = 1, #pics_3d do
       local p = pics_3d[i]
@@ -212,6 +235,10 @@ return function(love, enum, sys, tools)
   sys.on_draw(final_draw, -1)
 
   sys.on_update(function(dt)
+    if love.keyboard.isDown("left") then
+      cam_pos.x = cam_pos.x - dt
+      target = v3(cam_pos.x, cam_pos.y, cam_pos.z)
+    end
   end)
 
   return {

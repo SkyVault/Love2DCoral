@@ -120,7 +120,7 @@ function m4_projection(fov, near, far, aspect_ratio)
   m.m[1],  m.m[2],  m.m[3],  m.m[4]  = 2*near/(right-left), 0, (right+left)/(right-left), 0
   m.m[5],  m.m[6],  m.m[7],  m.m[8]  = 0, 2*near/(top-bottom), (top+bottom)/(top-bottom), 0
   m.m[9],  m.m[10], m.m[11], m.m[12] = 0, 0, -1*(far+near)/(far-near), -2*far*near/(far-near)
-  m.m[13], m.m[14], m.m[15], m.m[16] = 0, 0, -1, 0
+  m.m[13], m.m[14], m.m[15], m.m[16] = 0, 0,  -1, 0
 
   return m
 end

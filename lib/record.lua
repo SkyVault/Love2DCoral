@@ -27,7 +27,6 @@ return function(pp)
     local r = records[tbl._name_]
     assert(r)
     local x =  r._ctor_(tbl)
-    print("=>", x)
     return x
   end
 

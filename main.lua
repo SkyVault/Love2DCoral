@@ -1,5 +1,7 @@
 local Coral = require("coral")(nil, love)
 local component = Coral.actors.component
+local art = Coral.art
+local timer = Coral.timer
 
 local rot = 0
 local _dt = 0
@@ -20,11 +22,11 @@ Coral.sys.on_load(function()
 
   Coral.actors.spawn(player)
 
-  Coral.timer(1, function()
+  timer(1, function()
     print("ONE")
-    Coral.timer(1, function()
+    timer(1, function()
       print("TWO")
-      Coral.timer(1, function()
+      timer(1, function()
         print("THREE")
       end)
     end)
@@ -38,44 +40,15 @@ end)
 
 Coral.sys.on_draw(function()
   math.randomseed(1)
-  Coral.art.plane(
-    v3(-1, -1, 0),
-    v3(0, 0, 0),
-    v3(0.01, 0.01, 0.01)
-  ):color_(Red)
 
-  Coral.art.plane(
-    v3( 1, -1, 0),
+  art.plane(
     v3(0, 0, 0),
-    v3(0.01, 0.01, 0.01)
-  ):color_(Red)
-
-  Coral.art.plane(
-    v3( 1,  1, 0),
     v3(0, 0, 0),
-    v3(0.01, 0.01, 0.01)
+    v3(1.0, 1.0, 1.0)
   ):color_(Red)
-
-  Coral.art.plane(
-    v3(-1,  1, 0),
-    v3(0, 0, 0),
-    v3(0.01, 0.01, 0.01)
-  ):color_(Red)
-
-  for i = 0, 2000 do
-    local x = (-0.5 + math.random()) * 2
-    local y = (-0.5 + math.random()) * 2
-    Coral.art.plane(
-      v3(x, -y, 0),
-      v3(0, 0, 0),
-      v3(0.01, 0.01, 0.01)
-    ):color_(Yellow)
-  end
 
   Coral.actors.each({ Spatial, Drawable }, function(_, spatial, drawable)
-    --Coral.art.draw(drawable.pic, spatial.x, spatial.y, spatial.w, spatial.h)
-
-    Coral.art.rect(200, 200, 32, 32):color_(Tan)
+    art.rect(200, 200, 32, 32):color_(Tan)
   end)
 end)
 
