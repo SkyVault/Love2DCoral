@@ -1,6 +1,7 @@
 local sin = math.sin
 local cos = math.cos
 local tan = math.tan
+local sqrt = math.sqrt
 
 function v2(x, y)
   return setmetatable({ _kind_ = "v2", x = x or 0, y = y or 0 }, {
@@ -42,6 +43,10 @@ function v3(x, y, z)
     end,
     scaler_mult = function(sc, a, b, c)
       return a*sc, b*sc, c*sc
+    end,
+
+    distance_to = function(self, other)
+      return sqrt((other.x - self.x)^2 + (other.y - self.y)^2)
     end,
   }, {
     __tostring = function(self)

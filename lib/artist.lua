@@ -120,6 +120,7 @@ return function(love, enum, sys, tools, camera)
     local res = tools.builder {
       kind = kind,
       transform = t,
+      position = translation,
       color = {1, 1, 1, 1},
     }
 
@@ -190,6 +191,13 @@ return function(love, enum, sys, tools, camera)
     shader_3d:send("view", camera.view.m)
     shader_3d:send("projection", camera.projection.m)
 
+    -- BSP would be pretty handy
+
+    table.sort(pics_3d, function(a, b)
+      return a.position:distance_to(camera.position) >
+        b.position:distance_to(camera.position)
+    end)
+
     for i = 1, #pics_3d do
       local p = pics_3d[i]
 
@@ -259,8 +267,13 @@ return function(love, enum, sys, tools, camera)
     if love.keyboard.isDown("a") then mx = mx - 1 end
     if love.keyboard.isDown("d") then mx = mx + 1 end
 
-    if my ~= 0 then
-      local d = camera.yaw + (my < 0 and math.pi or 0)
+    if mx ~= 0 or my ~= 0 then
+
+      local d = camera.yaw +
+        (my < 0 and math.pi or 0) +
+        (mx < 0 and math.pi/2 or
+        (mx > 0 and -math.pi/2 or 0))
+
       local dx, dy = cos(d) * dt, sin(d) * dt
 
       camera.position.x = camera.position.x + dx * 5
