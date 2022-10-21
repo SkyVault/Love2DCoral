@@ -169,7 +169,7 @@ return function(love, enum, sys, tools, camera)
 
     mesh.plane = love.graphics.newMesh(
       vertex_format,
-      mesh.verts.plane(2),
+      mesh.verts.plane(1),
       "fan"
     )
   end
