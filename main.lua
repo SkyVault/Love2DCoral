@@ -54,6 +54,6 @@ end)
 
 Coral.sys.on_draw(function()
   love.graphics.setColor(Green)
-  love.graphics.print(_dt == 0 and 0 or 1/_dt, 10, 10)
+  love.graphics.print(Coral.clock.fps, 10, 10)
   love.graphics.setColor(White)
 end, -2)

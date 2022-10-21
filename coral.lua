@@ -32,6 +32,7 @@ return function(base_path, love)
   local actors = _require("lib.actors")(tools)
   local art = _require("lib.artist")(love, enums.enum, sys, tools, game_camera)
   local timers = _require("lib.timers")(sys)
+  local clock = require("lib.clock")(records.record)
 
   local coral = records.record("Coral") {
     record = records.record,
@@ -46,6 +47,8 @@ return function(base_path, love)
     timers = timers,
     camera = game_camera,
 
+    clock = clock:new(),
+
     print = pp.pprint,
     format = pp.pformat,
     timer = timers.timer,
@@ -56,6 +59,7 @@ return function(base_path, love)
   end
 
   function coral:update(dt)
+    self.clock:update(dt)
     self.sys.internal.update(dt)
   end
 

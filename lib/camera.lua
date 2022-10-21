@@ -55,8 +55,6 @@ return function(love, record)
       self.target.y = self.position.y + sin(self.yaw) * cpitch
       self.target.z = self.position.z + sin(self.pitch)
 
-      print(self.position)
-
       self:update_view_matrix()
     end,
 
