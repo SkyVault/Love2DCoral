@@ -30,6 +30,11 @@ vec4 position(mat4 transform_projection, vec4 vertex_pos) {
 ]]
 
 return function(love, enum, sys, tools, camera)
+  local contexts = enum {
+    "normal",
+    "ui"
+  }
+
   local pics_3d = {}
   local pics = {}
 
@@ -40,6 +45,32 @@ return function(love, enum, sys, tools, camera)
   local cam_pos = v3(0, 0, 2)
   local target = v3(0, 0, 0)
   local aspect = love.graphics.getWidth() / love.graphics.getHeight()
+
+  local _context_stack = {}
+  local context = contexts.normal
+
+  local function set_context(to)
+    context = to
+  end
+
+  local function push_context(ctx)
+    table.insert(_context_stack, ctx)
+  end
+
+  local function pop_context()
+    table.remove(_context_stack, #_context_stack)
+  end
+
+  local function with_context(ctx, callback)
+    push_context(ctx)
+    callback()
+    pop_context(ctx)
+  end
+
+  local function add_pic(pic)
+    pics[context] = pics[context] or {}
+    table.insert(pics[context], pic)
+  end
 
   local kinds = enum {
     "rectangle",
@@ -70,9 +101,10 @@ return function(love, enum, sys, tools, camera)
       x = x, y = y, w = w, h = h,
       rotation = 0,
       color = {1, 1, 1, 1},
-      layer = 0
+      layer = 0,
+      context = context,
     }
-    table.insert(pics, res)
+    add_pic(res)
     return res
   end
 
@@ -175,30 +207,31 @@ return function(love, enum, sys, tools, camera)
 
     love.graphics.setShader()
 
-    for i = 1, #pics do
-      local p = pics[i]
+    for ctx, ps in pairs(pics) do
+      for i = 1, #ps do
+        local p = ps[i]
+        kinds.case(p.kind) {
+          [kinds.rectangle] = function()
+            love.graphics.setColor(p.color)
+            love.graphics.rectangle("fill", p.x, p.y, p.w, p.h)
+          end,
 
-      kinds.case(p.kind) {
-        [kinds.rectangle] = function()
-          love.graphics.setColor(p.color)
-          love.graphics.rectangle("fill", p.x, p.y, p.w, p.h)
-        end,
+          [kinds.line_rectangle] = function()
+            love.graphics.setColor(p.color)
+            love.graphics.rectangle("line", p.x, p.y, p.w, p.h)
+          end,
 
-        [kinds.line_rectangle] = function()
-          love.graphics.setColor(p.color)
-          love.graphics.rectangle("line", p.x, p.y, p.w, p.h)
-        end,
+          [kinds.circle] = function()
+            love.graphics.setColor(p.color)
+            love.graphics.circle("fill", p.x, p.y, p.w)
+          end,
 
-        [kinds.circle] = function()
-          love.graphics.setColor(p.color)
-          love.graphics.circle("fill", p.x, p.y, p.w)
-        end,
-
-        [kinds.line_circle] = function()
-          love.graphics.setColor(p.color)
-          love.graphics.circle("line", p.x, p.y, p.w)
-        end,
-      }
+          [kinds.line_circle] = function()
+            love.graphics.setColor(p.color)
+            love.graphics.circle("line", p.x, p.y, p.w)
+          end,
+        }
+      end
     end
 
     love.graphics.setColor(init_color)
@@ -212,11 +245,11 @@ return function(love, enum, sys, tools, camera)
 
   sys.on_update(function(dt)
     if love.keyboard.isDown("e")  then
-      camera.yaw = camera.yaw - dt
+      camera.yaw = camera.yaw - dt * 5
     end
 
     if love.keyboard.isDown("q")  then
-      camera.yaw = camera.yaw + dt
+      camera.yaw = camera.yaw + dt * 5
     end
 
     local mx, my = 0, 0
@@ -226,12 +259,12 @@ return function(love, enum, sys, tools, camera)
     if love.keyboard.isDown("a") then mx = mx - 1 end
     if love.keyboard.isDown("d") then mx = mx + 1 end
 
-    if mx ~= 0 or my ~= 0 then
-      local a = atan(my, mx)
-      local d = camera.yaw - math.pi/4
-      local dx, dy = cos(d + a) * dt, sin(d + a) * dt
-      camera.position.x = camera.position.x + dx
-      camera.position.y = camera.position.y + dy
+    if my ~= 0 then
+      local d = camera.yaw + (my < 0 and math.pi or 0)
+      local dx, dy = cos(d) * dt, sin(d) * dt
+
+      camera.position.x = camera.position.x + dx * 5
+      camera.position.y = camera.position.y + dy * 5
     end
 
     if love.keyboard.isDown("-") then
@@ -245,6 +278,11 @@ return function(love, enum, sys, tools, camera)
 
   return {
     kinds = kinds,
+    set_context = set_context,
+    push_context = push_context,
+    pop_context = pop_context,
+    with_context = with_context,
+
     draw = draw,
     pic = pic,
     rect = rect,
