@@ -47,6 +47,12 @@ Coral.sys.on_draw(function()
     v3(1.0, 1.0, 1.0)
   ):color_(Red)
 
+  art.plane(
+    v3(5, 5, 0),
+    v3(Coral.clock.timer, Coral.clock.timer, Coral.clock.timer),
+    v3(1.0, 1.0, 1.0)
+  ):color_(Red)
+
   Coral.actors.each({ Spatial, Drawable }, function(_, spatial, drawable)
     art.rect(200, 200, 32, 32):color_(Tan)
   end)

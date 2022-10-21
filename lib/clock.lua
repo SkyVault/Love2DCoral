@@ -3,6 +3,7 @@ return function(record)
     delta = 0,
     fps = 0,
     ticks = 0,
+    timer = 0,
     average_delta = 0,
 
     _dt_coll = {},
@@ -22,6 +23,7 @@ return function(record)
         self.average_delta = dt
       end
 
+      self.timer = self.timer + dt
       self.delta = dt
       self.fps = math.floor(self.average_delta == 0 and (dt == 0 and 0 or 1 / dt) or 1 / self.average_delta)
       self.ticks = self.ticks + 1
