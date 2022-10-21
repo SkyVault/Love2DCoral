@@ -32,8 +32,8 @@ return function(base_path, love)
   local actors = _require("lib.actors")(tools)
   local art = _require("lib.artist")(love, enums.enum, sys, tools, game_camera)
   local timers = _require("lib.timers")(sys)
-  local clock = require("lib.clock")(records.record)
-  local watchers = require("lib.watchers")(sys)
+  local clock = _require("lib.clock")(records.record)
+  local watchers = _require("lib.watchers")(sys)
 
   local coral = records.record("Coral") {
     record = records.record,
