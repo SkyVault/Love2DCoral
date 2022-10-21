@@ -281,11 +281,11 @@ return function(love, enum, sys, tools, camera)
     end
 
     if love.keyboard.isDown("-") then
-      camera.position.z = camera.position.z + dt
+      camera.position.z = camera.position.z + dt * 5
     end
 
     if love.keyboard.isDown("=") then
-      camera.position.z = camera.position.z - dt
+      camera.position.z = camera.position.z - dt * 5
     end
   end)
 

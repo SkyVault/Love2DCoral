@@ -58,9 +58,7 @@ local bright_colors = {
 local bright_index = 1
 
 local function next_bright_color()
-  local c = bright_colors[bright_index]
-  bright_index = bright_index + 1
-  if bright_index > #bright_colors then bright_index = 1 end
+  local c = bright_colors[math.random(1, #bright_colors)]
   return c
 end
 
