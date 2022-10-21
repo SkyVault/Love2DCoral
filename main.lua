@@ -1,8 +1,7 @@
 local Coral = require("coral")(nil, love)
-local component = Coral.actors.component
-local art = Coral.art
-local timer = Coral.timer
-local clock = Coral.clock
+local actors = Coral.actors
+local component = actors.component
+local art, timer, clock = Coral.art, Coral.timer, Coral.clock
 
 local rot = 0
 local _dt = 0
@@ -48,15 +47,13 @@ Coral.sys.on_draw(function()
     v3(1.0, 1.0, 1.0)
   ):color_(Red)
 
-
   for i = 1, 100 do
     art.plane(
       v3((i % 10) * 4, math.floor(i / 10) * 4, 0),
       v3(clock.timer / i, clock.timer / i, clock.timer / i),
-      v3(1.0, 1.0, 1.0)
+      v3(0.5, 0.5, 0.5)
     ):color_(Coral.palette.next_bright_color())
   end
-
 
   Coral.actors.each({ Spatial, Drawable }, function(_, spatial, drawable)
     art.rect(200, 200, 32, 32):color_(Tan)
