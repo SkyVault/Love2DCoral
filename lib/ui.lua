@@ -29,7 +29,7 @@ return function(love, sys, art, tools, input)
     return ext({
       bg_color = {0.2, 0.2, 0.2, 0.95},
       fg_color =  Maroon,
-      font = love.graphics.newFont(24),
+      font = love.graphics.newFont(18),
       margin = 8,
       padding = 8,
     }, overrides or {})
