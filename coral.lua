@@ -117,6 +117,8 @@ return function(base_path, love)
     end
   end
 
+  love.conf = function(t) _love.conf(t) end
+
   love.keypressed = function(k)
     coral:keypressed(k)
     if _love.keypressed then
