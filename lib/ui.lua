@@ -137,6 +137,29 @@ return function(love, sys, art, tools, input)
     return hot and input.is_mouse_pressed(1)
   end
 
+  function ui:image_button(image)
+    local w, h = image:getWidth(), image:getHeight()
+    ui:next_size(w, h)
+    local ox, oy = self.cursor.x, self.cursor.y
+
+    local hot = self:is_hot(w, h)
+    local old = ui.theme.bg_color
+    local ml = love.mouse.isDown(1)
+
+    local tint = White
+    tint.a = 0.85
+    if hot then tint = { 1.0, 1.0, 1.0, 1.0 } end
+    if hot and ml then tint = { 0.9, 0.9, 1.0, 1.0 } end
+
+    self:next_size(w, h)
+    self:move_cursor(w, h)
+
+    art.image(image, ox, oy):color_(tint)
+
+    if hot then ui.theme.bg_color = old end
+    return hot and input.is_mouse_pressed(1)
+  end
+
   local function load()
     ui.containers = {
       { 0, 0, love.graphics.getWidth(), love.graphics.getHeight() }

@@ -77,6 +77,7 @@ return function(love, enum, sys, tools, camera, pp)
     "line_rectangle",
     "circle",
     "line_circle",
+    "image",
     "text",
     "plane",
   }
@@ -152,6 +153,12 @@ return function(love, enum, sys, tools, camera, pp)
 
   local function line_circle(x, y, r)
     return pic(kinds.line_circle, x, y, r * 2, r * 2)
+  end
+
+  local function image(img, x, y)
+    local i = pic(kinds.image, x, y, img:getWidth(), img:getHeight())
+    i.image = img
+    return i
   end
 
   local function text(txt, fnt, x, y)
@@ -251,6 +258,11 @@ return function(love, enum, sys, tools, camera, pp)
             love.graphics.circle("line", p.x, p.y, p.w)
           end,
 
+          [kinds.image] = function()
+            love.graphics.setColor(p.color)
+            love.graphics.draw(p.image, p.x, p.y)
+          end,
+
           [kinds.text] = function()
             love.graphics.setColor(p.color)
             love.graphics.setFont(p.font)
@@ -321,6 +333,7 @@ return function(love, enum, sys, tools, camera, pp)
     circle = circle,
     line_circle = line_circle,
     text = text,
+    image = image,
     plane = plane,
 
     mesh = mesh,

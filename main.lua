@@ -70,6 +70,9 @@ coral.sys.on_update(function(dt)
   ui:label("Hello")
   ui:title("Hello World!")
   ui:divider()
+  if ui:image_button(coral.assets.get_image("floor")) then
+ 
+  end
   ui:pop_container()
 end)
 
