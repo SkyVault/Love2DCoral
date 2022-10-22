@@ -103,14 +103,15 @@ return function(love, sys, art, tools, input)
 
   function ui:divider()
     local x, y, w, h = table.unpack(self:container())
-    local p = self.theme.padding / 2
-    art.rect(x + p, self.cursor.y - 8, w - p * 2, 4):color_(DarkGray)
-    self:move_cursor(w + 1, 8)
+    local p = self.theme.padding
+    art.rect(x, self.cursor.y, 4, 4):color_(White)
+    art.rect(x + p, self.cursor.y, w - p * 2, 4):color_(DarkGray)
+    self:move_cursor(w, 4)
   end
 
   function ui:newline()
     local x, y, w, h = table.unpack(self:container())
-    self:move_cursor(w + 1, self.max_height)
+    self:move_cursor(w, self.max_height)
   end
 
   function ui:button(text)

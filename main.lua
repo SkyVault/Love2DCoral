@@ -67,7 +67,7 @@ coral.sys.on_update(function(dt)
 
   ui:newline()
 
-  ui:label("Hello World!")
+  ui:label("Hello")
   ui:title("Hello World!")
   ui:divider()
   ui:pop_container()
