@@ -1,4 +1,4 @@
-return function(love, sys, art, tools)
+return function(love, sys, art, tools, input)
   local ext, aabb = tools.ext, tools.aabb
   local point_intersects_rect = tools.point_intersects_rect
 
@@ -107,7 +107,7 @@ return function(love, sys, art, tools)
     art.text(text, fnt, ox + self.theme.padding / 2, oy + self.theme.padding / 2):color_(White)
 
     if hot then ui.theme.bg_color = old end
-    return hot and love.mouse.isDown(1)
+    return hot and input.is_mouse_pressed(1)
   end
 
   local function load()

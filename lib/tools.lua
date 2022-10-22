@@ -82,6 +82,10 @@ local function set(...)
     self.vs[item] = item
     return self
   end
+  function s:remove(item)
+    self.vs[item] = nil
+    return self
+  end
   -- TODO:
   -- add
   -- sub

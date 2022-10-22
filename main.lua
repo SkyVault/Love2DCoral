@@ -46,6 +46,7 @@ Coral.sys.on_update(function(dt)
   ui:push_container(100, 100, 200, 200)
   ui:panel(200, 200)
   if ui:button("hello, world") then
+    print("Hello, World!")
   end
   ui:pop_container()
 end)

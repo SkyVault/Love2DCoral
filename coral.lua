@@ -35,7 +35,8 @@ return function(base_path, love)
     local timers = _require("lib.timers")(sys)
     local clock = _require("lib.clock")(records.record)
     local watchers = _require("lib.watchers")(sys)
-    local ui = _require("lib.ui")(love, sys, art, tools)
+    local input = _require("lib.input")(love, sys, tools.set)
+    local ui = _require("lib.ui")(love, sys, art, tools, input)
 
     return records.record("Coral") {
       record = records.record,
@@ -50,6 +51,7 @@ return function(base_path, love)
       timers = timers,
       camera = game_camera,
       ui = ui,
+      input = input,
 
       clock = clock:new(),
 
@@ -72,6 +74,14 @@ return function(base_path, love)
 
   function coral:draw()
     self.sys.internal.draw()
+  end
+
+  function coral:keypressed(k)
+    self.sys.internal.keypressed(k)
+  end
+
+  function coral:keyreleased(k)
+    self.sys.internal.keyreleased(k)
   end
 
   local ks = {}
@@ -102,6 +112,20 @@ return function(base_path, love)
 
     if _love.draw then
       _love.draw()
+    end
+  end
+
+  love.keypressed = function(k)
+    coral:keypressed(k)
+    if _love.keypressed then
+      _love.keypressed()
+    end
+  end
+
+  love.keyreleased = function(k)
+    coral:keyreleased(k)
+    if _love.keyreleased then
+      _love.keyreleased()
     end
   end
 
