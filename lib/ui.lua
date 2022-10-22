@@ -19,7 +19,6 @@ return function(love, sys, art, tools)
     self.cursor.x = x
     self.cursor.y = y
     table.insert(self.containers, { x, y, width, height })
-    art.line_rect(x, y, width, height):color_(Green)
   end
 
   function ui:pop_container()
@@ -66,12 +65,7 @@ return function(love, sys, art, tools)
   end
 
   function ui:panel(width, height)
-    width = width + ui.theme.padding
-    height = height + ui.theme.padding
-
-    self:next_size(width, height)
     art.rect(self.cursor.x, self.cursor.y, width, height):color_(self.theme.bg_color)
-    self:move_cursor(width, height)
   end
 
   function ui:label(text)
@@ -100,7 +94,10 @@ return function(love, sys, art, tools)
     if hot then ui.theme.bg_color = { 0.4, 0.4, 0.45, 0.99 } end
     if hot and ml then ui.theme.bg_color = { 0.4, 0.4, 0.85, 0.99 } end
 
-    self:panel(w - self.theme.padding, h - self.theme.padding)
+    self:next_size(w, h)
+    art.rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.bg_color)
+    self:move_cursor(w, h)
+
     art.text(text, fnt, ox + self.theme.padding / 2, oy + self.theme.padding / 2):color_(White)
 
     if hot then ui.theme.bg_color = old end

@@ -38,11 +38,15 @@ Coral.sys.on_update(function(dt)
   _dt = dt
 
   ui:push_container(10, 10, love.graphics.getWidth()  - 20, love.graphics.getHeight() - 20)
-
   for i = 1, 100 do
     ui:button(tostring(i))
   end
+  ui:pop_container()
 
+  ui:push_container(100, 100, 200, 200)
+  ui:panel(200, 200)
+  if ui:button("hello, world") then
+  end
   ui:pop_container()
 end)
 

@@ -17,45 +17,49 @@ return function(base_path, love)
     return try_require(loc) or try_require("lib.Coral." .. loc) or try_require("Coral." .. loc)
   end
 
-  _require("lib.maths")
+  local function create_coral()
+    _require("lib.maths")
 
-  local palette = _require("lib.palette")
-  local pp = _require("lib.pprint")
-  local tools = _require("lib.tools")
-  local records = _require("lib.record")(pp)
-  local camera = _require("lib.camera")(love, records.record)
+    local palette = _require("lib.palette")
+    local pp = _require("lib.pprint")
+    local tools = _require("lib.tools")
+    local records = _require("lib.record")(pp)
+    local camera = _require("lib.camera")(love, records.record)
 
-  local game_camera = camera:new {  }
+    local game_camera = camera:new {  }
 
-  local sys = _require("lib.systems")
-  local enums = _require("lib.enums")
-  local actors = _require("lib.actors")(tools)
-  local art = _require("lib.artist")(love, enums.enum, sys, tools, game_camera, pp)
-  local timers = _require("lib.timers")(sys)
-  local clock = _require("lib.clock")(records.record)
-  local watchers = _require("lib.watchers")(sys)
-  local ui = _require("lib.ui")(love, sys, art, tools)
+    local sys = _require("lib.systems")
+    local enums = _require("lib.enums")
+    local actors = _require("lib.actors")(tools)
+    local art = _require("lib.artist")(love, enums.enum, sys, tools, game_camera, pp)
+    local timers = _require("lib.timers")(sys)
+    local clock = _require("lib.clock")(records.record)
+    local watchers = _require("lib.watchers")(sys)
+    local ui = _require("lib.ui")(love, sys, art, tools)
 
-  local coral = records.record("Coral") {
-    record = records.record,
-    construct = records.construct,
+    return records.record("Coral") {
+      record = records.record,
+      construct = records.construct,
 
-    palette = palette,
-    sys = sys,
-    art = art,
-    tools = tools,
-    actors = actors,
-    enums = enums,
-    timers = timers,
-    camera = game_camera,
-    ui = ui,
+      palette = palette,
+      sys = sys,
+      art = art,
+      tools = tools,
+      actors = actors,
+      enums = enums,
+      timers = timers,
+      camera = game_camera,
+      ui = ui,
 
-    clock = clock:new(),
+      clock = clock:new(),
 
-    print = pp.pprint,
-    format = pp.pformat,
-    timer = timers.timer,
-  }
+      print = pp.pprint,
+      format = pp.pformat,
+      timer = timers.timer,
+    }
+  end
+
+  local coral = create_coral()
 
   function coral:load()
     self.sys.internal.load()
