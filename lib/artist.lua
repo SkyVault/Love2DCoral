@@ -163,7 +163,12 @@ return function(love, enum, sys, tools, camera)
   }
 
   local function load()
+
     love.graphics.setDepthMode("lequal", true)
+    local w, h = love.graphics.getWidth(), love.graphics.getHeight()
+    love.window.setMode(w, h, {
+      depth = 16
+    })
 
     shader_3d = love.graphics.newShader(vertex_shader_3d)
 
@@ -192,11 +197,6 @@ return function(love, enum, sys, tools, camera)
     shader_3d:send("projection", camera.projection.m)
 
     -- BSP would be pretty handy
-
-    table.sort(pics_3d, function(a, b)
-      return a.position:distance_to(camera.position) >
-        b.position:distance_to(camera.position)
-    end)
 
     for i = 1, #pics_3d do
       local p = pics_3d[i]
