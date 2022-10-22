@@ -30,6 +30,7 @@ return function(love, sys, art, tools, input)
       bg_color = {0.2, 0.2, 0.2, 0.95},
       fg_color =  Maroon,
       font = love.graphics.newFont(18),
+      title_font = love.graphics.newFont(24),
       margin = 8,
       padding = 8,
     }, overrides or {})
@@ -86,6 +87,20 @@ return function(love, sys, art, tools, input)
     ui:next_size(w, h)
     art.text(text, self.theme.font, self.cursor.x, self.cursor.y):color_(White)
     self:move_cursor(w, h)
+  end
+
+  function ui:title(text)
+    local fnt, w, h = self.theme.title_font, self:measure_text(text)
+    ui:next_size(w, h)
+    art.text(text, self.theme.title_font, self.cursor.x, self.cursor.y):color_(Blue)
+    self:move_cursor(w, h)
+  end
+
+  function ui:divider()
+    local x, y, w, h = table.unpack(self:container())
+    local p = self.theme.padding / 2
+    art.rect(x + p, self.cursor.y - 8, w - p * 2, 4):color_(DarkGray)
+    self:move_cursor(w + 1, 8)
   end
 
   function ui:button(text)
