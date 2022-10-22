@@ -70,6 +70,11 @@ return function(love, sys, art, tools, input)
     return fnt:getWidth(text) + self.theme.padding, fnt:getHeight() + self.theme.padding
   end
 
+  function ui:measure_title(text)
+    local fnt = ui.theme.title_font
+    return fnt:getWidth(text) + self.theme.padding, fnt:getHeight() + self.theme.padding
+  end
+
   function ui:is_hot(w, h)
     local ox, oy = self.cursor.x, self.cursor.y
     return point_intersects_rect(
@@ -90,7 +95,7 @@ return function(love, sys, art, tools, input)
   end
 
   function ui:title(text)
-    local fnt, w, h = self.theme.title_font, self:measure_text(text)
+    local fnt, w, h = self.theme.title_font, self:measure_title(text)
     ui:next_size(w, h)
     art.text(text, self.theme.title_font, self.cursor.x, self.cursor.y):color_(Blue)
     self:move_cursor(w, h)
@@ -101,6 +106,11 @@ return function(love, sys, art, tools, input)
     local p = self.theme.padding / 2
     art.rect(x + p, self.cursor.y - 8, w - p * 2, 4):color_(DarkGray)
     self:move_cursor(w + 1, 8)
+  end
+
+  function ui:newline()
+    local x, y, w, h = table.unpack(self:container())
+    self:move_cursor(w + 1, self.max_height)
   end
 
   function ui:button(text)
@@ -117,6 +127,7 @@ return function(love, sys, art, tools, input)
 
     self:next_size(w, h)
     art.rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.bg_color)
+    art.line_rect(self.cursor.x, self.cursor.y, w, h):color_(White)
     self:move_cursor(w, h)
 
     art.text(text, fnt, ox + self.theme.padding / 2, oy + self.theme.padding / 2):color_(White)
