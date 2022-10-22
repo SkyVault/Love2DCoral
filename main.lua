@@ -16,7 +16,12 @@ local Drawable = component("Drawable") {
 
 local panel = { x = 0 }
 
+local texture = nil
+
 coral.sys.on_load(function()
+  texture = love.graphics.newImage("res/floor.png")
+  texture:setFilter("nearest", "nearest")
+
   coral.tween.new(1, panel, { x = 200 }):start():on_complete_(function()
     coral.tween.new(1, panel, { x = 0 }):start():on_complete_(function()
     end)
@@ -44,11 +49,11 @@ coral.sys.on_update(function(dt)
   rot = rot + dt
   _dt = dt
 
-  ui:push_container(10, 10, love.graphics.getWidth()  - 20, love.graphics.getHeight() - 20)
-  for i = 1, 100 do
-    ui:button(tostring(i))
-  end
-  ui:pop_container()
+  --ui:push_container(10, 10, love.graphics.getWidth()  - 20, love.graphics.getHeight() - 20)
+  --for i = 1, 100 do
+    --ui:button(tostring(i))
+  --end
+  --ui:pop_container()
 
   ui:push_container(panel.x, 100, 200, 200)
   ui:panel(200, 200)
@@ -61,11 +66,7 @@ end)
 coral.sys.on_draw(function()
   --math.randomseed(1)
 
-  --art.plane(
-    --v3(0, 0, 0),
-    --v3(0, 0, 0),
-    --v3(1.0, 1.0, 1.0)
-  --):color_(Red)
+  art.plane(v3(0, 0, 0), v3(0, 0, 0), v3(1.0, 1.0, 1.0)):texture_(texture)
 
   --for i = 1, 100 do
     --art.plane(

@@ -4,7 +4,7 @@ local atan, cos, sin = math.atan, math.cos, math.sin
 ---@diagnostic disable-next-line: redefined-local
 local vertex_format = {
   {"VertexPosition", "float", 3},
-  --{"VertexTexCoord", "float", 2},
+  {"VertexTexCoord", "float", 2},
   --{"VertexNormal", "float", 3},
   --{"VertexColor", "byte", 4},
 }
@@ -84,15 +84,15 @@ return function(love, enum, sys, tools, camera, pp)
   local function plane_vertices(s, x, y, z)
     x, y, z = x or 0, y or 0, z or 0
     return {
-      { x + -s, y + -s, z },
-      { x + -s, y +  s, z },
-      { x +  s, y +  s, z },
-      { x + -s, y + -s, z },
+      { x + -s, y + -s, z, 0, 1 },
+      { x + -s, y +  s, z, 0, 0 },
+      { x +  s, y +  s, z, 1, 0 },
+      { x + -s, y + -s, z, 0, 0 },
 
-      { x + -s, y + -s, z },
-      { x +  s, y +  s, z },
-      { x +  s, y + -s, z },
-      { x + -s, y + -s, z },
+      { x + -s, y + -s, z, 0, 1 },
+      { x +  s, y +  s, z, 1, 0 },
+      { x +  s, y + -s, z, 1, 1 },
+      { x + -s, y + -s, z, 0, 1 },
     }
   end
 
@@ -123,6 +123,7 @@ return function(love, enum, sys, tools, camera, pp)
       transform = t,
       position = translation,
       color = {1, 1, 1, 1},
+      texture = 0,
     }
 
     table.insert(pics_3d, res)
@@ -172,7 +173,6 @@ return function(love, enum, sys, tools, camera, pp)
   }
 
   local function load()
-
     love.graphics.setDepthMode("lequal", true)
     local w, h = love.graphics.getWidth(), love.graphics.getHeight()
     love.window.setMode(w, h, {
@@ -216,7 +216,10 @@ return function(love, enum, sys, tools, camera, pp)
 
           local t = p.transform
           shader_3d:send("model", t.m)
-
+          -- we should group by texture for performance
+          if p.texture ~= 0 then
+            mesh.plane:setTexture(p.texture)
+          end
           love.graphics.draw(mesh.plane)
         end,
       }
