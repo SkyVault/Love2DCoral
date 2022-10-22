@@ -1,7 +1,7 @@
-local Coral = require("coral")(nil, love)
-local actors = Coral.actors
+local coral = require("coral")(nil, love)
+local actors = coral.actors
 local component = actors.component
-local art, timer, clock, ui = Coral.art, Coral.timer, Coral.clock, Coral.ui
+local art, timer, clock, ui = coral.art, coral.timer, coral.clock, coral.ui
 
 local rot = 0
 local _dt = 0
@@ -11,16 +11,23 @@ local Spatial = component("Spatial") {
 }
 
 local Drawable = component("Drawable") {
-  pic = Coral.art.pic(Coral.art.kinds.rectangle, 10, 10, 100, 100),
+  pic = coral.art.pic(coral.art.kinds.rectangle, 10, 10, 100, 100),
 }
 
-Coral.sys.on_load(function()
-  local player = Coral.actors.actor(
+local panel = { x = 0 }
+
+coral.sys.on_load(function()
+  coral.tween.new(1, panel, { x = 200 }):start():on_complete_(function()
+    coral.tween.new(1, panel, { x = 0 }):start():on_complete_(function()
+    end)
+  end)
+
+  local player = coral.actors.actor(
     Spatial:new { x = 32, y = 200 },
     Drawable:new { }
   )
 
-  Coral.actors.spawn(player)
+  coral.actors.spawn(player)
 
   timer(1, function()
     print("ONE")
@@ -33,7 +40,7 @@ Coral.sys.on_load(function()
   end)
 end)
 
-Coral.sys.on_update(function(dt)
+coral.sys.on_update(function(dt)
   rot = rot + dt
   _dt = dt
 
@@ -43,7 +50,7 @@ Coral.sys.on_update(function(dt)
   end
   ui:pop_container()
 
-  ui:push_container(100, 100, 200, 200)
+  ui:push_container(panel.x, 100, 200, 200)
   ui:panel(200, 200)
   if ui:button("hello, world") then
     print("Hello, World!")
@@ -51,7 +58,7 @@ Coral.sys.on_update(function(dt)
   ui:pop_container()
 end)
 
-Coral.sys.on_draw(function()
+coral.sys.on_draw(function()
   --math.randomseed(1)
 
   --art.plane(
@@ -65,16 +72,16 @@ Coral.sys.on_draw(function()
       --v3((i % 10) * 4, math.floor(i / 10) * 4, 0),
       --v3(clock.timer / i, clock.timer / i, clock.timer / i),
       --v3(0.5, 0.5, 0.5)
-    --):color_(Coral.palette.next_bright_color())
+    --):color_(coral.palette.next_bright_color())
   --end
 
-  --Coral.actors.each({ Spatial, Drawable }, function(_, spatial, drawable)
+  --coral.actors.each({ Spatial, Drawable }, function(_, spatial, drawable)
     --art.rect(200, 200, 32, 32):color_(Tan)
   --end)
 end)
 
-Coral.sys.on_draw(function()
+coral.sys.on_draw(function()
   love.graphics.setColor(Green)
-  love.graphics.print(Coral.clock.fps, 10, 10)
+  love.graphics.print(coral.clock.fps, 10, 10)
   love.graphics.setColor(White)
 end, -2)

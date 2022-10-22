@@ -37,6 +37,7 @@ return function(base_path, love)
     local watchers = _require("lib.watchers")(sys)
     local input = _require("lib.input")(love, sys, tools.set)
     local ui = _require("lib.ui")(love, sys, art, tools, input)
+    local tween = _require("lib.tweens")(sys, tools)
 
     return records.record("Coral") {
       record = records.record,
@@ -52,6 +53,7 @@ return function(base_path, love)
       camera = game_camera,
       ui = ui,
       input = input,
+      tween = tween,
 
       clock = clock:new(),
 
