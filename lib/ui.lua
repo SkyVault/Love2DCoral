@@ -64,30 +64,36 @@ return function(love, sys, art, tools)
     self.cursor.x = self.cursor.x + width + self.theme.margin
   end
 
+  function ui:measure_text(text)
+    local fnt = ui.theme.font
+    return fnt:getWidth(text) + self.theme.padding, fnt:getHeight() + self.theme.padding
+  end
+
+  function ui:is_hot(w, h)
+    local ox, oy = self.cursor.x, self.cursor.y
+    return point_intersects_rect(
+      v2(love.mouse.getX(), love.mouse.getY()),
+      { x = ox, y = oy, width = w, height = h }
+    )
+  end
+
   function ui:panel(width, height)
     art.rect(self.cursor.x, self.cursor.y, width, height):color_(self.theme.bg_color)
   end
 
   function ui:label(text)
-    local fnt = self.theme.font
-    local w, h = fnt:getWidth(text) + self.theme.padding, fnt:getHeight() + self.theme.padding
+    local fnt, w, h = self.theme.font, self:measure_text(text)
     ui:next_size(w, h)
     art.text(text, self.theme.font, self.cursor.x, self.cursor.y):color_(White)
     self:move_cursor(w, h)
   end
 
   function ui:button(text)
-    local fnt = self.theme.font
-    local w, h = fnt:getWidth(text) + self.theme.padding, fnt:getHeight() + self.theme.padding
+    local fnt, w, h = self.theme.font, self:measure_text(text)
     ui:next_size(w, h)
-    local mx, my = love.mouse.getPosition()
     local ox, oy = self.cursor.x, self.cursor.y
 
-    local hot = point_intersects_rect(
-      v2(mx, my),
-      { x = ox, y = oy, width = w, height = h }
-    )
-
+    local hot = self:is_hot(w, h)
     local old = ui.theme.bg_color
     local ml = love.mouse.isDown(1)
 
@@ -101,7 +107,6 @@ return function(love, sys, art, tools)
     art.text(text, fnt, ox + self.theme.padding / 2, oy + self.theme.padding / 2):color_(White)
 
     if hot then ui.theme.bg_color = old end
-
     return hot and love.mouse.isDown(1)
   end
 
