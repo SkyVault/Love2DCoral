@@ -38,6 +38,7 @@ return function(base_path, love)
     local input = _require("lib.input")(love, sys, tools.set)
     local ui = _require("lib.ui")(love, sys, art, tools, input)
     local tween = _require("lib.tweens")(sys, tools)
+    local assets = _require("lib.assets")(love)
 
     return records.record("Coral") {
       record = records.record,
@@ -54,6 +55,7 @@ return function(base_path, love)
       ui = ui,
       input = input,
       tween = tween,
+      assets = assets,
 
       clock = clock:new(),
 
