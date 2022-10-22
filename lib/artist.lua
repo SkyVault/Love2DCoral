@@ -29,7 +29,7 @@ vec4 position(mat4 transform_projection, vec4 vertex_pos) {
 }
 ]]
 
-return function(love, enum, sys, tools, camera)
+return function(love, enum, sys, tools, camera, pp)
   local contexts = enum {
     "normal",
     "ui"
@@ -77,6 +77,7 @@ return function(love, enum, sys, tools, camera)
     "line_rectangle",
     "circle",
     "line_circle",
+    "text",
     "plane",
   }
 
@@ -150,6 +151,14 @@ return function(love, enum, sys, tools, camera)
 
   local function line_circle(x, y, r)
     return pic(kinds.line_circle, x, y, r * 2, r * 2)
+  end
+
+  local function text(txt, fnt, x, y)
+    local w, h = fnt:getWidth(txt), fnt:getHeight()
+    local p = pic(kinds.text, x, y, w, h)
+    p.text = txt
+    p.font = fnt
+    return p
   end
 
   local function plane(translation, rotation, scle)
@@ -238,6 +247,12 @@ return function(love, enum, sys, tools, camera)
             love.graphics.setColor(p.color)
             love.graphics.circle("line", p.x, p.y, p.w)
           end,
+
+          [kinds.text] = function()
+            love.graphics.setColor(p.color)
+            love.graphics.setFont(p.font)
+            love.graphics.print(p.text, p.x, p.y, p.rotation)
+          end,
         }
       end
     end
@@ -302,6 +317,7 @@ return function(love, enum, sys, tools, camera)
     line_rect = line_rect,
     circle = circle,
     line_circle = line_circle,
+    text = text,
     plane = plane,
 
     mesh = mesh,

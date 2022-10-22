@@ -1,16 +1,3 @@
-local function ext(a, b)
-  setmetatable(a, getmetatable(b))
-  for k, v in pairs(b) do
-    if type(v) == "table" then
-      a[k] = setmetatable(a[k] or {}, getmetatable(v))
-      ext(a[k], v)
-    else
-      a[k] = v
-    end
-  end
-  return a
-end
-
 -- https://gist.github.com/tylerneylon/81333721109155b2d244#file-copy-lua-L77
 local function copy(obj, seen)
 	-- Handle non-tables and previously-seen tables.
@@ -23,6 +10,19 @@ local function copy(obj, seen)
 	s[obj] = res
 	for k, v in next, obj do res[copy(k, s)] = copy(v, s) end
 	return setmetatable(res, getmetatable(obj))
+end
+
+local function ext(a, b)
+  setmetatable(a, getmetatable(b))
+  for k, v in pairs(b) do
+    if type(v) == "table" then
+      a[k] = setmetatable(a[k] or {}, getmetatable(v))
+      ext(a[k], v)
+    else
+      a[k] = v
+    end
+  end
+  return a
 end
 
 local function walk(tbl, callback)
@@ -90,6 +90,15 @@ local function set(...)
   return s
 end
 
+local function aabb(a, b)
+  return a.x + a.width > b.x and a.x < b.x + b.width and
+    a.y + a.height > b.y and a.y < b.y + b.height
+end
+
+local function point_intersects_rect(p, r)
+  return p.x > r.x and p.x < r.x + r.width and p.y > r.y and p.y < r.y + r.height
+end
+
 return {
   set = set,
   ext = ext,
@@ -99,5 +108,7 @@ return {
   copy = copy,
   filter = filter,
   builder = builder,
+  aabb = aabb,
+  point_intersects_rect = point_intersects_rect,
 }
 

@@ -11,6 +11,19 @@ local function ext(a, b)
   return a
 end
 
+local function copy(obj, seen)
+	-- Handle non-tables and previously-seen tables.
+	if type(obj) ~= 'table' then return obj end
+	if seen and seen[obj] then return seen[obj] end
+
+	-- New table; mark it as seen an copy recursively.
+	local s = seen or {}
+	local res = {}
+	s[obj] = res
+	for k, v in next, obj do res[copy(k, s)] = copy(v, s) end
+	return setmetatable(res, getmetatable(obj))
+end
+
 return function(pp)
   local records = {}
 
@@ -40,10 +53,10 @@ return function(pp)
           _ctor_ = function(t)
             assert(t._name_ ~= nil)
             local r = records[t._name_]:name()
-            return ext(r, t)
+            return ext(copy(r), t)
           end,
           new = function(self, d)
-            return ext(self, d or {})
+            return ext(copy(self), d or {})
           end,
         }, {
           __tostring = function(self)

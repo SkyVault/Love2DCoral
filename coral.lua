@@ -30,10 +30,11 @@ return function(base_path, love)
   local sys = _require("lib.systems")
   local enums = _require("lib.enums")
   local actors = _require("lib.actors")(tools)
-  local art = _require("lib.artist")(love, enums.enum, sys, tools, game_camera)
+  local art = _require("lib.artist")(love, enums.enum, sys, tools, game_camera, pp)
   local timers = _require("lib.timers")(sys)
   local clock = _require("lib.clock")(records.record)
   local watchers = _require("lib.watchers")(sys)
+  local ui = _require("lib.ui")(love, sys, art, tools)
 
   local coral = records.record("Coral") {
     record = records.record,
@@ -47,6 +48,7 @@ return function(base_path, love)
     enums = enums,
     timers = timers,
     camera = game_camera,
+    ui = ui,
 
     clock = clock:new(),
 

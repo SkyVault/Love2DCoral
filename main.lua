@@ -1,7 +1,7 @@
 local Coral = require("coral")(nil, love)
 local actors = Coral.actors
 local component = actors.component
-local art, timer, clock = Coral.art, Coral.timer, Coral.clock
+local art, timer, clock, ui = Coral.art, Coral.timer, Coral.clock, Coral.ui
 
 local rot = 0
 local _dt = 0
@@ -36,28 +36,36 @@ end)
 Coral.sys.on_update(function(dt)
   rot = rot + dt
   _dt = dt
+
+  ui:push_container(10, 10, love.graphics.getWidth()  - 20, love.graphics.getHeight() - 20)
+
+  for i = 1, 100 do
+    ui:button(tostring(i))
+  end
+
+  ui:pop_container()
 end)
 
 Coral.sys.on_draw(function()
-  math.randomseed(1)
+  --math.randomseed(1)
 
-  art.plane(
-    v3(0, 0, 0),
-    v3(0, 0, 0),
-    v3(1.0, 1.0, 1.0)
-  ):color_(Red)
+  --art.plane(
+    --v3(0, 0, 0),
+    --v3(0, 0, 0),
+    --v3(1.0, 1.0, 1.0)
+  --):color_(Red)
 
-  for i = 1, 100 do
-    art.plane(
-      v3((i % 10) * 4, math.floor(i / 10) * 4, 0),
-      v3(clock.timer / i, clock.timer / i, clock.timer / i),
-      v3(0.5, 0.5, 0.5)
-    ):color_(Coral.palette.next_bright_color())
-  end
+  --for i = 1, 100 do
+    --art.plane(
+      --v3((i % 10) * 4, math.floor(i / 10) * 4, 0),
+      --v3(clock.timer / i, clock.timer / i, clock.timer / i),
+      --v3(0.5, 0.5, 0.5)
+    --):color_(Coral.palette.next_bright_color())
+  --end
 
-  Coral.actors.each({ Spatial, Drawable }, function(_, spatial, drawable)
-    art.rect(200, 200, 32, 32):color_(Tan)
-  end)
+  --Coral.actors.each({ Spatial, Drawable }, function(_, spatial, drawable)
+    --art.rect(200, 200, 32, 32):color_(Tan)
+  --end)
 end)
 
 Coral.sys.on_draw(function()
