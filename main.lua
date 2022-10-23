@@ -44,6 +44,8 @@ coral.sys.on_load(function()
   end)
 end)
 
+local t = false
+
 coral.sys.on_update(function(dt)
   rot = rot + dt
   _dt = dt
@@ -69,6 +71,9 @@ coral.sys.on_update(function(dt)
 
   ui:label("Hello")
   ui:title("Hello World!")
+
+  t = ui:toggle("Toggle Me", t)
+
   ui:divider()
   if ui:image_button(coral.assets.get_image("floor")) then
  

@@ -137,6 +137,34 @@ return function(love, sys, art, tools, input)
     return hot and input.is_mouse_pressed(1)
   end
 
+  function ui:toggle(text, checked)
+    local fnt, w, h = self.theme.font, self:measure_text(text)
+    ui:next_size(w, h)
+    local ox, oy = self.cursor.x, self.cursor.y
+
+    local hot = self:is_hot(w, h)
+    local old = ui.theme.bg_color
+    local ml = love.mouse.isDown(1)
+
+    if hot then ui.theme.bg_color = { 0.4, 0.4, 0.45, 0.99 } end
+    if checked then ui.theme.bg_color = { 0.4, 0.4, 0.85, 0.99 } end
+
+    self:next_size(w, h)
+    art.rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.bg_color)
+    art.line_rect(self.cursor.x, self.cursor.y, w, h):color_(White)
+    self:move_cursor(w, h)
+
+    art.text(text, fnt, ox + self.theme.padding / 2, oy + self.theme.padding / 2):color_(White)
+
+    if hot or checked then ui.theme.bg_color = old end
+
+    if hot and input.is_mouse_pressed(1) then
+      return not checked
+    else
+      return checked
+    end
+  end
+
   function ui:image_button(image)
     local w, h = image:getWidth(), image:getHeight()
     ui:next_size(w, h)
