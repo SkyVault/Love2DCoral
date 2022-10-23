@@ -96,22 +96,24 @@ return function(love, sys, art, tools, input)
 
   function ui:title(text)
     local fnt, w, h = self.theme.title_font, self:measure_title(text)
-    ui:next_size(w, h)
+    self:newline()
     art.text(text, self.theme.title_font, self.cursor.x, self.cursor.y):color_(Blue)
-    self:move_cursor(w, h)
+    self:newline()
   end
 
   function ui:divider()
     local x, y, w, h = table.unpack(self:container())
     local p = self.theme.padding
-    art.rect(x, self.cursor.y, 4, 4):color_(White)
-    art.rect(x + p, self.cursor.y, w - p * 2, 4):color_(DarkGray)
-    self:move_cursor(w, 4)
+    local h = 6
+    self:newline()
+    art.rect(x + p, self.cursor.y + h/2, w - p * 2, 4):color_(DarkGray)
+    self:newline(h + p)
   end
 
-  function ui:newline()
+  function ui:newline(height)
     local x, y, w, h = table.unpack(self:container())
-    self:move_cursor(w, self.max_height)
+    self.cursor.x = x
+    self.cursor.y = self.cursor.y + (height or math.max(self.max_height, self.theme.font:getHeight()))
   end
 
   function ui:button(text)

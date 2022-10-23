@@ -75,25 +75,27 @@ coral.sys.on_update(function(dt)
   t = ui:toggle("Toggle Me", t)
 
   ui:divider()
+
   if ui:image_button(coral.assets.get_image("floor")) then
- 
+    print("HERE?")
   end
+
   ui:pop_container()
 end)
 
 coral.sys.on_draw(function()
-  --math.randomseed(1)
+  math.randomseed(1)
 
   art.plane(v3(0, 0, 0), v3(0, 0, 0), v3(1.0, 1.0, 1.0))
     :texture_(coral.assets.get_image("floor"))
 
-  --for i = 1, 100 do
-    --art.plane(
-      --v3((i % 10) * 4, math.floor(i / 10) * 4, 0),
-      --v3(clock.timer / i, clock.timer / i, clock.timer / i),
-      --v3(0.5, 0.5, 0.5)
-    --):color_(coral.palette.next_bright_color())
-  --end
+  for i = 1, 100 do
+    art.plane(
+      v3((i % 10) * 2, math.floor(i / 10) * 2, 0),
+      v3(clock.timer / i, clock.timer / i, clock.timer / i),
+      v3(0.5, 0.5, 0.5)
+    ):color_(coral.palette.next_bright_color())
+  end
 
   --coral.actors.each({ Spatial, Drawable }, function(_, spatial, drawable)
     --art.rect(200, 200, 32, 32):color_(Tan)
