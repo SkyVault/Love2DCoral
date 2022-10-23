@@ -98,7 +98,7 @@ return function(love, sys, art, tools, input)
     local fnt, w, h = self.theme.title_font, self:measure_title(text)
     self:newline()
     art.text(text, self.theme.title_font, self.cursor.x, self.cursor.y):color_(Blue)
-    self:newline()
+    self:newline(h)
   end
 
   function ui:divider()
