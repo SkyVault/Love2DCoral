@@ -1,5 +1,5 @@
-return function(record)
-  return record("Clock") {
+return function(vault)
+  return vault.table("Clock") {
     delta = 0,
     fps = 0,
     ticks = 0,

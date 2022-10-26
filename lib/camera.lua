@@ -2,10 +2,10 @@ local sqrt = math.sqrt
 local PI = math.pi
 local atan, cos, sin, max, abs = math.atan, math.cos, math.sin, math.max, math.abs
 
-return function(love, record)
+return function(love, vault)
   local aspect = love.graphics.getWidth() / love.graphics.getHeight()
 
-  local Camera = record("camera") {
+  local Camera = vault.table("camera") {
     fov = PI / 2,  -- 45.0 deg
     near = 0.01,
     far = 1000,

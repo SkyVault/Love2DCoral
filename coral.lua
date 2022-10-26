@@ -23,8 +23,8 @@ return function(base_path, love)
     local palette = _require("lib.palette")
     local pp = _require("lib.pprint")
     local tools = _require("lib.tools")
-    local records = _require("lib.record")(pp)
-    local camera = _require("lib.camera")(love, records.record)
+    local vault = _require("lib.vault")
+    local camera = _require("lib.camera")(love, vault)
 
     local game_camera = camera:new {  }
 
@@ -33,17 +33,15 @@ return function(base_path, love)
     local actors = _require("lib.actors")(tools)
     local art = _require("lib.artist")(love, enums.enum, sys, tools, game_camera, pp)
     local timers = _require("lib.timers")(sys)
-    local clock = _require("lib.clock")(records.record)
+    local clock = _require("lib.clock")(vault)
     local watchers = _require("lib.watchers")(sys)
     local input = _require("lib.input")(love, sys, tools.set)
     local ui = _require("lib.ui")(love, sys, art, tools, input)
     local tween = _require("lib.tweens")(sys, tools)
     local assets = _require("lib.assets")(love)
 
-    return records.record("Coral") {
-      record = records.record,
-      construct = records.construct,
-
+    return vault.table("Coral") {
+      vault = vault,
       palette = palette,
       sys = sys,
       art = art,
