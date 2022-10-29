@@ -57,7 +57,7 @@ coral.sys.on_update(function(dt)
   ui:pop_container()
 
   ui:push_container(panel.x, 100, 200, 200)
-  ui:panel(200, 200)
+  ui:panel(200, 250)
 
   if ui:button("A") then
     print("Hello, World!")
