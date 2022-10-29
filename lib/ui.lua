@@ -85,7 +85,6 @@ return function(love, sys, art, tools, input)
   end
 
   function ui:panel(width, height)
-    ui:newline()
     art.rect(self.cursor.x, self.cursor.y, width, height):color_(self.theme.bg_color)
   end
 
