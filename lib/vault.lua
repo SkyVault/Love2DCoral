@@ -77,7 +77,7 @@ function vault.write(obj)
 end
 
 function vault.table(name, initializer)
-  local function fn(tbl, name, initializer)
+  local function fn(tbl)
     if name then
       tbl["vault:name"] = name
       vault.types[name] = tbl
@@ -108,7 +108,7 @@ function vault.table(name, initializer)
   end
 
   return function(tbl)
-    return fn(tbl, name, initializer)
+    return fn(tbl)
   end
 end
 

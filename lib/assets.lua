@@ -22,6 +22,10 @@ return function(love)
   local function get_images_from_set(set_id)
     local res = {}
     local iset = image_sets[set_id]
+    if not iset then
+      print("Cannot find image set: ", set_id)
+      return nil
+    end
     for i = 1, #iset do
       res[i] = get_image(iset[i])
     end
