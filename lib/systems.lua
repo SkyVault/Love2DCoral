@@ -6,7 +6,7 @@ local keypresses = {}
 local keyreleases = {}
 
 local function cmp(a, b)
-  return a.priority > b.priority
+  return a.priority < b.priority
 end
 
 local function on_load(fn, priority)
