@@ -36,7 +36,7 @@ return function(base_path, love)
     local clock = _require("lib.clock")(vault)
     local watchers = _require("lib.watchers")(sys)
     local input = _require("lib.input")(love, sys, tools.set)
-    local ui = _require("lib.ui")(love, sys, art, tools, input)
+    local ui = _require("lib.ui")(love, sys, art, tools, input, vault)
     local tween = _require("lib.tweens")(sys, tools)
     local assets = _require("lib.assets")(love)
 

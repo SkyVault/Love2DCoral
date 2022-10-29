@@ -1,5 +1,5 @@
-return function(love, sys, art, tools, input)
-  local ext, aabb = tools.ext, tools.aabb
+return function(love, sys, art, tools, input, vault)
+  local ext, aabb = vault.ext, tools.aabb
   local point_intersects_rect = tools.point_intersects_rect
 
   local theme_stack = {}
@@ -29,7 +29,7 @@ return function(love, sys, art, tools, input)
   function ui.create_theme(overrides)
     return ext({
       bg_color = {0.2, 0.2, 0.2, 0.95},
-      fg_color =  Maroon,
+      fg_color =  LightGray,
       font = love.graphics.newFont(18),
       title_font = love.graphics.newFont(24),
       margin = 8,
@@ -39,7 +39,7 @@ return function(love, sys, art, tools, input)
 
   function ui:push_theme(overrides)
     table.insert(theme_stack, self.create_theme(ui.theme))
-    self.theme = ext(self.theme, overrides)
+    self.theme = ext(vault.copy(self.theme), overrides)
   end
 
   function ui:pop_theme()
@@ -130,7 +130,7 @@ return function(love, sys, art, tools, input)
 
     self:next_size(w, h)
     art.rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.bg_color)
-    art.line_rect(self.cursor.x, self.cursor.y, w, h):color_(White)
+    art.line_rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.fg_color)
     self:move_cursor(w, h)
 
     art.text(text, fnt, ox + self.theme.padding / 2, oy + self.theme.padding / 2):color_(White)
@@ -153,7 +153,7 @@ return function(love, sys, art, tools, input)
 
     self:next_size(w, h)
     art.rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.bg_color)
-    art.line_rect(self.cursor.x, self.cursor.y, w, h):color_(White)
+    art.line_rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.fg_color)
     self:move_cursor(w, h)
 
     art.text(text, fnt, ox + self.theme.padding / 2, oy + self.theme.padding / 2):color_(White)

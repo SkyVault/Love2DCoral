@@ -63,9 +63,11 @@ coral.sys.on_update(function(dt)
   ui:push_container(panel.x, 100, 200, 200)
   ui:panel(200, 250)
 
-  if ui:button("A") then
+  ui:push_theme { fg_color = Red }
+  if ui:button("AButton") then
     print("Hello, World!")
   end
+  ui:pop_theme()
 
   if ui:button("B") then
     print("Hello, World!")
