@@ -18,6 +18,7 @@ return function(love, sys, art, tools, input)
   function ui:push_container(x, y, width, height)
     self.cursor.x = x
     self.cursor.y = y
+    self.max_height = 0
     table.insert(self.containers, { x, y, width, height })
   end
 
