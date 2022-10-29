@@ -19,6 +19,10 @@ local panel = { x = 0 }
 local texture = nil
 
 coral.sys.on_load(function()
+  love.window.setMode(love.graphics.getWidth(), love.graphics.getHeight(), {
+    resizable = true
+  })
+
   coral.assets.load_image("floor", "res/floor.png"):setFilter("nearest", "nearest")
 
   coral.tween.new(1, panel, { x = 200 }):start():on_complete_(function()

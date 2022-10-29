@@ -133,6 +133,10 @@ return function(base_path, love)
     end
   end
 
+  love.resize = function(w, h)
+    coral.art.resize(w, h)
+  end
+
   _G["love"] = _love
   for i = 1, #ks do
     _G["love"][ks[i]] = love[ks[i]]

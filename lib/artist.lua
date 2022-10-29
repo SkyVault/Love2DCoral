@@ -202,6 +202,10 @@ return function(love, enum, sys, tools, camera, pp)
     },
   }
 
+  local function resize(w, h)
+    camera.aspect = love.graphics.getWidth() / love.graphics.getHeight()
+  end
+
   local function load()
     love.graphics.setDepthMode("lequal", true)
     local w, h = love.graphics.getWidth(), love.graphics.getHeight()
@@ -344,6 +348,7 @@ return function(love, enum, sys, tools, camera, pp)
 
   return {
     kinds = kinds,
+    resize = resize,
     set_context = set_context,
     push_context = push_context,
     pop_context = pop_context,
