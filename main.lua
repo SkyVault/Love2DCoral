@@ -50,11 +50,11 @@ coral.sys.on_update(function(dt)
   rot = rot + dt
   _dt = dt
 
-  --ui:push_container(10, 10, love.graphics.getWidth()  - 20, love.graphics.getHeight() - 20)
-  --for i = 1, 100 do
-    --ui:button(tostring(i))
-  --end
-  --ui:pop_container()
+  ui:push_container(10, 10, love.graphics.getWidth()  - 20, love.graphics.getHeight() - 20)
+  for i = 1, 100 do
+    ui:button(tostring(i))
+  end
+  ui:pop_container()
 
   ui:push_container(panel.x, 100, 200, 200)
   ui:panel(200, 200)
@@ -65,6 +65,10 @@ coral.sys.on_update(function(dt)
 
   if ui:button("B") then
     print("Hello, World!")
+  end
+
+  for i = 1, 3 do
+    ui:button("WRAP")
   end
 
   ui:newline()

@@ -181,7 +181,6 @@ return function(love, sys, art, tools, input)
     if hot then tint = { 1.0, 1.0, 1.0, 1.0 } end
     if hot and ml then tint = { 0.9, 0.9, 1.0, 1.0 } end
 
-    self:next_size(w, h)
     self:move_cursor(w, h)
 
     art.image(image, ox, oy):color_(tint)
