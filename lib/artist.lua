@@ -5,7 +5,7 @@ local atan, cos, sin = math.atan, math.cos, math.sin
 local vertex_format = {
   {"VertexPosition", "float", 3},
   {"VertexTexCoord", "float", 2},
-  --{"VertexNormal", "float", 3},
+  {"VertexNormal", "float", 3},
   --{"VertexColor", "byte", 4},
 }
 
@@ -16,16 +16,40 @@ attribute vec3 VertexNormal;
 
 varying vec4 world_pos; varying vec4 view_pos; 
 varying vec3 vertex_normal; varying vec4 vertex_color;
-varying vec4 screen_pos; 
+varying vec3 frag_pos; 
 
 vec4 position(mat4 transform_projection, vec4 vertex_pos) {
   world_pos = model * vertex_pos;
   view_pos = view * world_pos;
-  screen_pos = projection * view_pos;
+
+  vec4 mvp = projection * view_pos;
+
+  vec4 f = model * vertex_pos;
+  frag_pos = f.xyz;
 
   vertex_normal = VertexNormal;
 
-  return screen_pos;
+  return mvp;
+}
+]]
+
+local fragment_shader_3d = [[
+varying vec3 vertex_normal;
+varying vec3 frag_pos;
+
+vec3 light_pos = vec3(10, 4, 10);
+vec3 ambient = vec3(0.2, 0.2, 0.2);
+
+vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords) {
+    vec4 texturecolor = Texel(tex, texture_coords);
+
+    vec3 norm = normalize(vertex_normal);
+    vec3 light_dir = normalize(light_pos - frag_pos);
+
+    float diff = max(dot(norm, light_dir), 0.0);
+    vec3 diffuse = diff * vec3(1, 1, 1);
+
+    return texturecolor * color * vec4(ambient + diffuse, 1.0);
 }
 ]]
 
@@ -85,15 +109,14 @@ return function(love, enum, sys, tools, camera, pp)
   local function plane_vertices(s, x, y, z)
     x, y, z = x or 0, y or 0, z or 0
     return {
-      { x + -s, y + -s, z, 0, 1 },
-      { x + -s, y +  s, z, 0, 0 },
-      { x +  s, y +  s, z, 1, 0 },
-      { x + -s, y + -s, z, 0, 0 },
-
-      { x + -s, y + -s, z, 0, 1 },
-      { x +  s, y +  s, z, 1, 0 },
-      { x +  s, y + -s, z, 1, 1 },
-      { x + -s, y + -s, z, 0, 1 },
+      { x + -s, y + -s, z,  0, 1,  0, 1, 0 },
+      { x + -s, y +  s, z,  0, 0,  0, 1, 0 },
+      { x +  s, y +  s, z,  1, 0,  0, 1, 0 },
+      { x + -s, y + -s, z,  0, 0,  0, 1, 0 },
+      { x + -s, y + -s, z,  0, 1,  0, 1, 0 },
+      { x +  s, y +  s, z,  1, 0,  0, 1, 0 },
+      { x +  s, y + -s, z,  1, 1,  0, 1, 0 },
+      { x + -s, y + -s, z,  0, 1,  0, 1, 0 },
     }
   end
 
@@ -186,7 +209,7 @@ return function(love, enum, sys, tools, camera, pp)
       depth = 16
     })
 
-    shader_3d = love.graphics.newShader(vertex_shader_3d)
+    shader_3d = love.graphics.newShader(fragment_shader_3d, vertex_shader_3d)
 
     mesh.plane = love.graphics.newMesh(
       vertex_format,
