@@ -44,7 +44,7 @@ return function(love, sys, set)
     for k, v in pairs(reg) do
       keys[k] = love.keyboard.isDown(k)
     end
-  end, -1)
+  end, 9999)
 
   sys.on_keypressed(function(k) reg[k] = true end)
   sys.on_keyreleased(function(k) reg[k] = false end)
