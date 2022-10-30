@@ -5,35 +5,49 @@ local ui_draws = {}
 local keypresses = {}
 local keyreleases = {}
 
+local handled = {}
+
+local function is_handled(fn)
+  if handled[fn] then return true end
+  handled[fn] = fn
+  return false
+end
+
 local function cmp(a, b)
   return a.priority < b.priority
 end
 
 local function on_load(fn, priority)
+  if is_handled(fn) then return end
   table.insert(loads, { fn = fn, priority = priority or 0 })
   table.sort(loads, cmp)
 end
 
 local function on_update(fn, priority)
+  if is_handled(fn) then return end
   table.insert(updates, { fn = fn, priority = priority or 0 })
   table.sort(updates, cmp)
 end
 
 local function on_draw(fn, priority)
+  if is_handled(fn) then return end
   table.insert(draws, { fn = fn, priority = priority or 0 })
   table.sort(draws, cmp)
 end
 
 local function on_ui_draw(fn, priority)
+  if is_handled(fn) then return end
   table.insert(ui_draws, { fn = fn, priority = priority or 0 })
   table.sort(ui_draws, cmp)
 end
 
 local function on_keypressed(fn)
+  if is_handled(fn) then return end
   table.insert(keypresses, fn)
 end
 
 local function on_keyreleased(fn)
+  if is_handled(fn) then return end
   table.insert(keyreleases, fn)
 end
 

@@ -388,9 +388,11 @@ return function(sys, tools)
 
   local function update(dt)
      for i = 1, #tweens do
-       if tweens[i]:update(dt) then
-         tweens[i].on_complete()
-         table.remove(tweens, i)
+       if tweens[i] then
+         if tweens[i]:update(dt) then
+           tweens[i].on_complete()
+           table.remove(tweens, i)
+         end
        end
      end
   end

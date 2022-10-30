@@ -20,7 +20,8 @@ local texture = nil
 
 coral.sys.on_load(function()
   love.window.setMode(love.graphics.getWidth(), love.graphics.getHeight(), {
-    resizable = true
+    resizable = true,
+    depth = 16,
   })
 
   coral.assets.load_image("floor", "res/floor.png"):setFilter("nearest", "nearest")

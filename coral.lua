@@ -18,12 +18,14 @@ return function(base_path, love)
   end
 
   local function create_coral()
-    _require("lib.maths")
+
+    local vault = _require("lib.vault")
+
+    _require("lib.maths")(vault)
 
     local palette = _require("lib.palette")
     local pp = _require("lib.pprint")
     local tools = _require("lib.tools")
-    local vault = _require("lib.vault")
     local camera = _require("lib.camera")(love, vault)
 
     local game_camera = camera:new {  }
