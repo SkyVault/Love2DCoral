@@ -26,7 +26,7 @@ return function(vault)
 
   function v3(x, y, z)
     return vault.table("v3", function(self)
-      setmetatable(self, {
+      return setmetatable(self, {
       __tostring = function(this)
         return string.format("%0.2f %0.2f %0.2f", this.x, this.y, this.z)
       end,
