@@ -3,6 +3,8 @@ local actors = coral.actors
 local component = actors.component
 local art, timer, clock, ui = coral.art, coral.timer, coral.clock, coral.ui
 
+print(v2(1, 1), v2(12, 32) + v2(23, 4))
+
 local rot = 0
 local _dt = 0
 
