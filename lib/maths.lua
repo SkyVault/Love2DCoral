@@ -85,11 +85,16 @@ return function(vault)
     m = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
   }
 
-  function v2(x, y) return _v2:new({ x = x or 0, y = y or 0 }) end
-  function v3(x, y, z) return _v3:new({ x = x or 0, y = y or 0, z = z or 0 }) end
+  function v2(x, y) return _v2:new_fast({ x = x or 0, y = y or 0 }) end
+  function v3(x, y, z) return _v3:new_fast({ x = x or 0, y = y or 0, z = z or 0 }) end
+
+  function v2f(x, y) return { x = x or 0, y = y or 0 } end
+  function v3f(x, y, z) return { x = x or 0, y = y or 0, z = z or 0 } end
 
   function m4()
-    local m = _m4:new()
+    local m = { m = {} } -- _m4:new {
+      --m = { 1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1 }
+    --}
     m.m[ 1], m.m[ 2], m.m[ 3], m.m[ 4] = 1, 0, 0, 0
     m.m[ 5], m.m[ 6], m.m[ 7], m.m[ 8] = 0, 1, 0, 0
     m.m[ 9], m.m[10], m.m[11], m.m[12] = 0, 0, 1, 0
@@ -103,17 +108,11 @@ return function(vault)
     m.m[ 8] = translation.y
     m.m[12] = translation.z
 
-    if rotation:is "v3" then
-      local ca, cb, cc = cos(rotation.z), cos(rotation.y), cos(rotation.x)
-      local sa, sb, sc = sin(rotation.z), sin(rotation.y), sin(rotation.x)
-      m.m[1], m.m[ 2], m.m[ 3] = ca*cb, ca*sb*sc - sa*cc, ca*sb*cc + sa*sc
-      m.m[5], m.m[ 6], m.m[ 7] = sa*cb, sa*sb*sc + ca*cc, sa*sb*cc - ca*sc
-      m.m[9], m.m[10], m.m[11] = -sb, cb*sc, cb*cc
-
-      -- todo quaternion
-    else
-      error("Invalid rotation type, expected v3")
-    end
+    local ca, cb, cc = cos(rotation.z), cos(rotation.y), cos(rotation.x)
+    local sa, sb, sc = sin(rotation.z), sin(rotation.y), sin(rotation.x)
+    m.m[1], m.m[ 2], m.m[ 3] = ca*cb, ca*sb*sc - sa*cc, ca*sb*cc + sa*sc
+    m.m[5], m.m[ 6], m.m[ 7] = sa*cb, sa*sb*sc + ca*cc, sa*sb*cc - ca*sc
+    m.m[9], m.m[10], m.m[11] = -sb, cb*sc, cb*cc
 
     -- scale
     local sx, sy, sz = scale.x, scale.y, scale.z

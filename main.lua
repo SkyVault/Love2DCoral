@@ -21,6 +21,20 @@ local panel = { x = 0 }
 local texture = nil
 
 coral.sys.on_load(function()
+  --love.profiler = require("lib.profile")
+  --love.profiler.start()
+
+  --for i = 1, 1000 do
+    --local t = v3(math.random(), math.random(), math.random())
+    --local r = v3(math.random(), math.random(), math.random())
+    --local s = v3(math.random(), math.random(), math.random())
+    --m4_transform(t, r, s)
+  --end
+
+  --love.report = love.profiler.report(20)
+  --love.profiler.reset()
+  --love.profiler.stop()
+
   love.window.setMode(love.graphics.getWidth(), love.graphics.getHeight(), {
     resizable = true,
     depth = 16,
@@ -54,46 +68,46 @@ end)
 local t = false
 
 coral.sys.on_update(function(dt)
-  rot = rot + dt
-  _dt = dt
+  --rot = rot + dt
+  --_dt = dt
 
-  ui:push_container(10, 10, love.graphics.getWidth()  - 20, love.graphics.getHeight() - 20)
-  for i = 1, 100 do
-    ui:button(tostring(i))
-  end
-  ui:pop_container()
+  --ui:push_container(10, 10, love.graphics.getWidth()  - 20, love.graphics.getHeight() - 20)
+  --for i = 1, 100 do
+    --ui:button(tostring(i))
+  --end
+  --ui:pop_container()
 
-  ui:push_container(panel.x, 100, 200, 200)
-  ui:panel(200, 250)
+  --ui:push_container(panel.x, 100, 200, 200)
+  --ui:panel(200, 250)
 
-  ui:push_theme { fg_color = Red }
-  if ui:button("AButton") then
-    print("Hello, World!")
-  end
-  ui:pop_theme()
+  --ui:push_theme { fg_color = Red }
+  --if ui:button("AButton") then
+    --print("Hello, World!")
+  --end
+  --ui:pop_theme()
 
-  if ui:button("B") then
-    print("Hello, World!")
-  end
+  --if ui:button("B") then
+    --print("Hello, World!")
+  --end
 
-  for i = 1, 3 do
-    ui:button("WRAP")
-  end
+  --for i = 1, 3 do
+    --ui:button("WRAP")
+  --end
 
-  ui:newline()
+  --ui:newline()
 
-  ui:label("Hello")
-  ui:title("Hello World!")
+  --ui:label("Hello")
+  --ui:title("Hello World!")
 
-  t = ui:toggle("Toggle Me", t)
+  --t = ui:toggle("Toggle Me", t)
 
-  ui:divider()
+  --ui:divider()
 
-  if ui:image_button(coral.assets.get_image("floor")) then
-    print("HERE?")
-  end
+  --if ui:image_button(coral.assets.get_image("floor")) then
+    --print("HERE?")
+  --end
 
-  ui:pop_container()
+  --ui:pop_container()
 end)
 
 coral.sys.on_draw(function()
@@ -110,13 +124,15 @@ coral.sys.on_draw(function()
     ):color_(coral.palette.next_bright_color())
   end
 
-  --coral.actors.each({ Spatial, Drawable }, function(_, spatial, drawable)
-    --art.rect(200, 200, 32, 32):color_(Tan)
-  --end)
+  coral.actors.each({ Spatial, Drawable }, function(_, spatial, drawable)
+    art.rect(200, 200, 32, 32):color_(Tan)
+  end)
 end)
 
 coral.sys.on_draw(function()
   love.graphics.setColor(Green)
   love.graphics.print(coral.clock.fps, 10, 10)
   love.graphics.setColor(White)
-end, -2)
+
+  love.graphics.print(love.report or "Please wait...")
+end, 20)

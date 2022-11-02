@@ -134,13 +134,13 @@ return function(love, enum, sys, tools, camera, pp)
   end
 
   local function tkey(t, r, s)
-    return fmt("%f%f%f%f%f%f%f%f%f",t.x,t.y,t.z,r.x,r.y,r.z,s.x,s.y,s.z)
+    return fmt("%x%x%x%x%x%x%x%f%f",t.x,t.y,t.z,r.x,r.y,r.z,s.x,s.y,s.z)
   end
 
-  local transform_cache = {}
+  local _transform_cache = {}
 
   local function pic3d(kind, translation, rotation, scle)
-    local t = m4_transform(translation, rotation, scle)
+    local t = { t = translation, r = rotation, s = scle }
 
     local res = tools.builder {
       kind = kind,
@@ -247,8 +247,7 @@ return function(love, enum, sys, tools, camera, pp)
       kinds.case(p.kind) {
         [kinds.plane] = function()
           love.graphics.setColor(p.color)
-
-          local t = p.transform
+          local t = m4_transform(p.transform.t, p.transform.r, p.transform.s)
           shader_3d:send("model", t.m)
           -- we should group by texture for performance
           if p.texture ~= 0 then
