@@ -20,7 +20,7 @@ local panel = { x = 0 }
 
 local texture = nil
 
-coral.sys.on_load(function()
+coral.sys.load(function()
   --love.profiler = require("lib.profile")
   --love.profiler.start()
 
@@ -47,7 +47,14 @@ coral.sys.on_load(function()
     end)
   end)
 
-  local player = coral.actors.actor(
+  local a_random_table = coral.vault.table {
+    hello = "world",
+    [420] = { 1, 2, 3, { four = true } },
+  }
+
+  print(a_random_table)
+
+  local player = coral.actors.spawn(
     Spatial:new { x = 32, y = 200 },
     Drawable:new { }
   )
@@ -67,7 +74,7 @@ end)
 
 local t = false
 
-coral.sys.on_update(function(dt)
+coral.sys.update(function(dt)
   --rot = rot + dt
   --_dt = dt
 
@@ -110,7 +117,7 @@ coral.sys.on_update(function(dt)
   ui:pop_container()
 end)
 
-coral.sys.on_draw(function()
+coral.sys.draw(function()
   math.randomseed(1)
 
   art.plane(v3(0, 0, 0), v3(0, 0, 0), v3(1.0, 1.0, 1.0))
@@ -129,7 +136,7 @@ coral.sys.on_draw(function()
   end)
 end)
 
-coral.sys.on_draw(function()
+coral.sys.draw(function()
   love.graphics.setColor(Green)
   love.graphics.print(coral.clock.fps, 10, 10)
   love.graphics.setColor(White)

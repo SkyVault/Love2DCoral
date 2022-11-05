@@ -36,7 +36,7 @@ return function(love, sys, set)
     return not now and last
   end
 
-  sys.on_update(function()
+  sys.update(function()
     for i = 1, 3 do
       mouses[i] = mouses[i] == nil and false or love.mouse.isDown(i)
     end
@@ -46,8 +46,8 @@ return function(love, sys, set)
     end
   end, 9999)
 
-  sys.on_keypressed(function(k) reg[k] = true end)
-  sys.on_keyreleased(function(k) reg[k] = false end)
+  sys.keypressed(function(k) reg[k] = true end)
+  sys.keyreleased(function(k) reg[k] = false end)
 
   return {
     is_down = is_down,

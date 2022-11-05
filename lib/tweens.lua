@@ -397,7 +397,7 @@ return function(sys, tools)
      end
   end
 
-  sys.on_update(update)
+  sys.update(update)
 
   return tween
 end

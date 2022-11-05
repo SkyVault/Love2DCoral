@@ -196,6 +196,15 @@ return function(love, enum, sys, tools, camera, pp)
     return pic3d(kinds.plane, translation, rotation, scle)
   end
 
+  local function build_mesh(vertices)
+    local m = love.graphics.newMesh(
+      vertex_format,
+      vertices,
+      "fan"
+    )
+    return m
+  end
+
   local mesh = {
     verts = {
       plane = plane_vertices,
@@ -215,11 +224,7 @@ return function(love, enum, sys, tools, camera, pp)
 
     shader_3d = love.graphics.newShader(fragment_shader_3d, vertex_shader_3d)
 
-    mesh.plane = love.graphics.newMesh(
-      vertex_format,
-      mesh.verts.plane(1),
-      "fan"
-    )
+    mesh.plane = build_mesh(mesh.verts.plane(1))
   end
 
   local x = 0
@@ -304,11 +309,9 @@ return function(love, enum, sys, tools, camera, pp)
     pics_3d = {}
   end
 
-  sys.on_load(load)
-  sys.on_draw(final_draw, -1)
-
-  sys.on_update(function(dt)
-  end)
+  sys.load(load)
+  sys.draw(final_draw, -1)
+  sys.update(function(dt) end)
 
   return {
     kinds = kinds,
@@ -317,6 +320,8 @@ return function(love, enum, sys, tools, camera, pp)
     push_context = push_context,
     pop_context = pop_context,
     with_context = with_context,
+
+    build_mesh = build_mesh,
 
     draw = draw,
     pic = pic,

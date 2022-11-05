@@ -62,7 +62,12 @@ local function next_bright_color()
   return c
 end
 
+local function color(r, g, b, a)
+  return { r, g = g or r, b = b or r, a = a or 1 }
+end
+
 return {
+  color = color,
   mix_color = mix_color,
   next_bright_color = next_bright_color,
   hex = hex,

@@ -1,4 +1,4 @@
-return function(tools)
+return function(tools, vault)
   local set = tools.set
   local copy = tools.copy
   local map = tools.map
@@ -6,11 +6,75 @@ return function(tools)
   local ext = tools.ext
 
   local actors = {}
+  local spawns = {}
   local actors_by_id = {}
   local views = {}
   local unpack = table.unpack
 
+  local _id = 0
+
   -- Ev.defsignal("actor-killed")
+  local function next_id()
+    _id = _id + 1
+    return love.data.encode("string", "hex", love.data.hash("md5", tostring(_id)))
+  end
+
+  local actor = vault.table("actor") {
+      _components_ = {},
+      _tags_ = set(),
+      _should_destroy_ = false,
+      _id_ = next_id(),
+
+      id = function(self)
+        return self._id_
+      end,
+
+      kill = function(self)
+        self._should_destroy_ = true
+        --Ev.emit("actor-killed", self)
+      end,
+
+      dead = function(self)
+        return self._should_destroy_
+      end,
+
+      add = function(self, ...)
+        for _, v in ipairs({ ... }) do
+          self._components_[v["component:name"]] = copy(v)
+        end
+        return self
+      end,
+
+      add_tags = function(self, ...)
+        local ts = { ... }
+        for i = 1, #ts do
+          self._tags_:add(ts[i])
+        end
+      end,
+
+      has_tag = function(self, tag)
+        return self._tags_:has(tag)
+      end,
+
+      has = function(self, ...)
+        for _, v in ipairs({ ... }) do
+          if self._components_[v["component:name"]] == nil then
+            return false
+          end
+        end
+        return true
+      end,
+
+      get = function(self, ...)
+        local comps = { ... }
+        if #comps == 1 then
+          return self._components_[comps[1]["component:name"]]
+        else
+          return unpack(map(function(it) return self:get(it) end, comps))
+        end
+      end,
+  }
+
 
   local function clear_killed(c)
     actors = filter(
@@ -31,11 +95,11 @@ return function(tools)
 
   local function key(cs)
     table.sort(cs, function(a, b)
-      return a._name_:upper() > b._name_:upper()
+      return a["component:name"]:upper() > b["component:name"]:upper()
     end)
     local k = ""
     for i = 1, #cs do
-      k = k .. cs[i]._name_
+      k = k .. cs[i]["component:name"]
     end
     return k
   end
@@ -44,11 +108,11 @@ return function(tools)
     return actors_by_id[id]
   end
 
-  local function spawn(actor, ...)
-    table.insert(actors, actor)
-    actors_by_id[actor:id()] = actor
+  local function spawn(...)
+    local ac = actor:new():add(...)
+    table.insert(actors, ac)
+    actors_by_id[ac:id()] = ac
     views = {}
-    actor:add(...)
   end
 
   local function view(...)
@@ -87,98 +151,23 @@ return function(tools)
   end
 
   local function component(name)
-    return function(it)
-      return setmetatable(ext(it, {
-        _kind_ = "component",
-        _name_ = name,
-        new = function(self, diff)
-          return ext(copy(self), diff or {})
-        end,
-      }), {
-        __tostring = function(self)
-          local fields = ""
-          for k, v in pairs(self) do
-            if k:sub(1, 1) ~= "_" and k:sub(#k, #k) ~= "_" then
-              fields = fields .. string.format("%s: %s ", k, v)
-            end
-          end
+    if type(name) == "table" then
+      return vault.ext2(vault.base(name)) {
 
-          return string.format(
-          "%s(%s)",
-          self._name_,
-          fields:sub(0, #fields - 1)
-          )
-        end,
-      })
+      }
     end
-  end
+
+    return function(tbl)
+      tbl = vault.base(tbl)
 
 
-  local _id = 0
+      if name then
+        tbl["component:name"] = name
+        vault.types[name] = tbl
+      end
 
-  local function next_id()
-    _id = _id + 1
-    return love.data.encode("string", "hex", love.data.hash("md5", tostring(_id)))
-  end
-
-  local function actor(...)
-    return({
-      _kind_ = "actor",
-      _components_ = {},
-      _tags_ = set(),
-      _should_destroy_ = false,
-      _id_ = next_id(),
-
-      id = function(self)
-        return self._id_
-      end,
-
-      kill = function(self)
-        self._should_destroy_ = true
-        --Ev.emit("actor-killed", self)
-      end,
-
-      dead = function(self)
-        return self._should_destroy_
-      end,
-
-      add = function(self, ...)
-        for _, v in ipairs({ ... }) do
-          assert(v._kind_ == "component")
-          self._components_[v._name_] = copy(v)
-        end
-        return self
-      end,
-
-      add_tags = function(self, ...)
-        local ts = { ... }
-        for i = 1, #ts do
-          self._tags_:add(ts[i])
-        end
-      end,
-
-      has_tag = function(self, tag)
-        return self._tags_:has(tag)
-      end,
-
-      has = function(self, ...)
-        for _, v in ipairs({ ... }) do
-          if self._components_[v._name_] == nil then
-            return false
-          end
-        end
-        return true
-      end,
-
-      get = function(self, ...)
-        local comps = { ... }
-        if #comps == 1 then
-          return self._components_[comps[1]._name_]
-        else
-          return unpack(map(function(it) return self:get(it) end, comps))
-        end
-      end,
-    }):add(...)
+      return tbl
+    end
   end
 
   return {

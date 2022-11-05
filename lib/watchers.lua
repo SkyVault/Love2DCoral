@@ -12,8 +12,8 @@ return function(sys)
   function watchers:watch(label, value)
   end
 
-  sys.on_update(update)
-  sys.on_draw(draw)
+  sys.update(update)
+  sys.draw(draw)
 
   return watchers
 end

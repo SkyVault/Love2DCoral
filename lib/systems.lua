@@ -85,12 +85,12 @@ local function keyreleased(k)
 end
 
 return {
-  on_load = on_load,
-  on_update = on_update,
-  on_draw = on_draw,
-  on_ui_draw = on_ui_draw,
-  on_keypressed = on_keypressed,
-  on_keyreleased = on_keyreleased,
+  load = load,
+  update = update,
+  draw = draw,
+  ui_draw = ui_draw,
+  keypressed = on_keypressed,
+  keyreleased = on_keyreleased,
 
   internal = {
     load = _load,

@@ -206,9 +206,9 @@ return function(love, sys, art, tools, input, vault)
     ui.cursor = v2()
   end
 
-  sys.on_load(load)
-  sys.on_update(update)
-  sys.on_draw(draw)
+  sys.load(load)
+  sys.update(update)
+  sys.draw(draw)
 
   return ui
 end

@@ -10,7 +10,7 @@ return function(sys)
     return t
   end
 
-  sys.on_update(function(dt)
+  sys.update(function(dt)
     for i = 1, #timers.ts do
       timers.ts[i].timeout = timers.ts[i].timeout - dt
 
