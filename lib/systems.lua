@@ -17,25 +17,25 @@ local function cmp(a, b)
   return a.priority < b.priority
 end
 
-local function on_load(fn, priority)
+local function load(fn, priority)
   if is_handled(fn) then return end
   table.insert(loads, { fn = fn, priority = priority or 0 })
   table.sort(loads, cmp)
 end
 
-local function on_update(fn, priority)
+local function update(fn, priority)
   if is_handled(fn) then return end
   table.insert(updates, { fn = fn, priority = priority or 0 })
   table.sort(updates, cmp)
 end
 
-local function on_draw(fn, priority)
+local function draw(fn, priority)
   if is_handled(fn) then return end
   table.insert(draws, { fn = fn, priority = priority or 0 })
   table.sort(draws, cmp)
 end
 
-local function on_ui_draw(fn, priority)
+local function ui_draw(fn, priority)
   if is_handled(fn) then return end
   table.insert(ui_draws, { fn = fn, priority = priority or 0 })
   table.sort(ui_draws, cmp)
@@ -51,19 +51,19 @@ local function on_keyreleased(fn)
   table.insert(keyreleases, fn)
 end
 
-local function load()
+local function _load()
   for i = 1, #loads do
     loads[i].fn()
   end
 end
 
-local function update(dt)
+local function _update(dt)
   for i = 1, #updates do
     updates[i].fn(dt)
   end
 end
 
-local function draw()
+local function _draw()
   for i = 1, #draws do
     draws[i].fn()
   end
@@ -93,9 +93,9 @@ return {
   on_keyreleased = on_keyreleased,
 
   internal = {
-    load = load,
-    update = update,
-    draw = draw,
+    load = _load,
+    update = _update,
+    draw = _draw,
     keypressed = keypressed,
     keyreleased = keyreleased,
   },

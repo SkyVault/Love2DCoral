@@ -308,41 +308,6 @@ return function(love, enum, sys, tools, camera, pp)
   sys.on_draw(final_draw, -1)
 
   sys.on_update(function(dt)
-    if love.keyboard.isDown("e")  then
-      camera.yaw = camera.yaw - dt * 5
-    end
-
-    if love.keyboard.isDown("q")  then
-      camera.yaw = camera.yaw + dt * 5
-    end
-
-    local mx, my = 0, 0
-
-    if love.keyboard.isDown("s") then my = my - 1 end
-    if love.keyboard.isDown("w") then my = my + 1 end
-    if love.keyboard.isDown("a") then mx = mx - 1 end
-    if love.keyboard.isDown("d") then mx = mx + 1 end
-
-    if mx ~= 0 or my ~= 0 then
-
-      local d = camera.yaw +
-        (my < 0 and math.pi or 0) +
-        (mx < 0 and math.pi/2 or
-        (mx > 0 and -math.pi/2 or 0))
-
-      local dx, dy = cos(d) * dt, sin(d) * dt
-
-      camera.position.x = camera.position.x + dx * 5
-      camera.position.y = camera.position.y + dy * 5
-    end
-
-    if love.keyboard.isDown("-") then
-      camera.position.z = camera.position.z + dt * 5
-    end
-
-    if love.keyboard.isDown("=") then
-      camera.position.z = camera.position.z - dt * 5
-    end
   end)
 
   return {

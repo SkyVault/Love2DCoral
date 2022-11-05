@@ -98,7 +98,8 @@ return function(love, sys, art, tools, input, vault)
   function ui:title(text)
     local fnt, w, h = self.theme.title_font, self:measure_title(text)
     self:newline()
-    art.text(text, self.theme.title_font, self.cursor.x, self.cursor.y):color_(Blue)
+    art.text(text, self.theme.title_font, self.cursor.x, self.cursor.y + 4):color_(Black)
+    art.text(text, self.theme.title_font, self.cursor.x, self.cursor.y):color_(Tan)
     self:newline(h)
   end
 
@@ -129,6 +130,7 @@ return function(love, sys, art, tools, input, vault)
     if hot and ml then ui.theme.bg_color = { 0.4, 0.4, 0.85, 0.99 } end
 
     self:next_size(w, h)
+    art.rect(self.cursor.x + 4, self.cursor.y + 4, w, h):color_({0, 0, 0, 0.5})
     art.rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.bg_color)
     art.line_rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.fg_color)
     self:move_cursor(w, h)
@@ -152,6 +154,7 @@ return function(love, sys, art, tools, input, vault)
     if checked then ui.theme.bg_color = { 0.4, 0.4, 0.85, 0.99 } end
 
     self:next_size(w, h)
+    art.rect(self.cursor.x + 4, self.cursor.y + 4, w, h):color_(Black)
     art.rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.bg_color)
     art.line_rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.fg_color)
     self:move_cursor(w, h)
@@ -183,6 +186,7 @@ return function(love, sys, art, tools, input, vault)
 
     self:move_cursor(w, h)
 
+    art.rect(ox + 4, oy + 4, w, h):color_(Black)
     art.image(image, ox, oy):color_(tint)
 
     if hot then ui.theme.bg_color = old end

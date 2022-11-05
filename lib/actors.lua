@@ -44,10 +44,11 @@ return function(tools)
     return actors_by_id[id]
   end
 
-  local function spawn(actor)
+  local function spawn(actor, ...)
     table.insert(actors, actor)
     actors_by_id[actor:id()] = actor
     views = {}
+    actor:add(...)
   end
 
   local function view(...)
