@@ -101,6 +101,7 @@ return function(love, enum, sys, tools, camera, pp)
     "line_rectangle",
     "circle",
     "line_circle",
+    "line",
     "image",
     "text",
     "plane",
@@ -165,6 +166,10 @@ return function(love, enum, sys, tools, camera, pp)
 
   local function rect(x, y, w, h)
     return pic(kinds.rectangle, x, y, w, h)
+  end
+
+  local function line(x1, y1, x2, y2)
+    return pic(kinds.line, x1, y1, x2, y2)
   end
 
   local function line_rect(x, y, w, h)
@@ -232,9 +237,9 @@ return function(love, enum, sys, tools, camera, pp)
 
   local function final_draw()
     x = x + 0.01
-    table.sort(pics, function(a, b)
-      return a.layer < b.layer
-    end)
+    --table.sort(pics, function(a, b)
+      --return a.layer < b.layer
+    --end)
 
     local init_color = { love.graphics.getColor() }
 
@@ -270,6 +275,13 @@ return function(love, enum, sys, tools, camera, pp)
       for i = 1, #ps do
         local p = ps[i]
         kinds.case(p.kind) {
+          [kinds.line] = function()
+            local x1, y1, x2, y2 = p.x, p.y, p.w, p.h
+
+            love.graphics.setColor(p.color)
+            love.graphics.line(x1, y1, x2, y2)
+          end,
+
           [kinds.rectangle] = function()
             love.graphics.setColor(p.color)
             love.graphics.rectangle("fill", p.x, p.y, p.w, p.h, p.corner_radius, p.corner_radius, p.corner_radius > 0 and p.corner_radius or nil)
@@ -330,6 +342,7 @@ return function(love, enum, sys, tools, camera, pp)
     line_rect = line_rect,
     circle = circle,
     line_circle = line_circle,
+    line = line,
     text = text,
     image = image,
     plane = plane,

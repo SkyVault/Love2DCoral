@@ -54,12 +54,10 @@ coral.sys.load(function()
     end)
   end)
 
-  local player = coral.actors.spawn(
+  coral.actors.spawn(
     Spatial:new { x = 32, y = 200 },
     Drawable:new { }
   )
-
-  coral.actors.spawn(player)
 
   timer(1, function()
     print("ONE")

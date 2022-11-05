@@ -113,6 +113,7 @@ return function(tools, vault)
     table.insert(actors, ac)
     actors_by_id[ac:id()] = ac
     views = {}
+    return ac
   end
 
   local function view(...)
