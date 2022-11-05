@@ -1,4 +1,5 @@
-return function(love, sys, art, tools, input, vault)
+return function(love, sys, art, tools, input, vault, palette)
+  local fmt = string.format
   local ext, aabb = vault.ext, tools.aabb
   local point_intersects_rect = tools.point_intersects_rect
 
@@ -88,6 +89,28 @@ return function(love, sys, art, tools, input, vault)
     art.rect(self.cursor.x, self.cursor.y, width, height):color_(self.theme.bg_color)
   end
 
+  function ui:rpanel(width, height, title)
+    if title then
+      local w, h = self.theme.font:getWidth(title), self.theme.font:getHeight() + ui.theme.margin
+      art.rect(self.cursor.x, self.cursor.y + 6, w + ui.theme.margin * 2, h + height - 12 + 4)
+        :color_({ 0.2, 0.3, 0.4, 1.0 })
+        :corner_radius_(8)
+
+      art.text(
+        title,
+        self.theme.font,
+        self.cursor.x + ui.theme.margin,
+        self.cursor.y + 6
+      )
+      :color_(White)
+      self.cursor.y = self.cursor.y + h
+    end
+
+    art.rect(self.cursor.x, self.cursor.y, width, height)
+      :color_(self.theme.bg_color)
+      :corner_radius_(8)
+  end
+
   function ui:label(text)
     local fnt, w, h = self.theme.font, self:measure_text(text)
     ui:next_size(w, h)
@@ -115,6 +138,49 @@ return function(love, sys, art, tools, input, vault)
     local x, y, w, h = table.unpack(self:container())
     self.cursor.x = x
     self.cursor.y = self.cursor.y + self.theme.margin + (height or math.max(self.max_height, self.theme.font:getHeight()))
+  end
+
+  function ui:table(tbl, label)
+    local ps, font = {}, self.theme.font
+
+    if #tbl > 0 then
+      local startx, cursorx = 0, 0
+      local starty, cursory = 0, 0
+      for i = 1, #tbl do
+        local s, fnt = tostring(tbl[i]), ui.theme.font
+        local w, h = fnt:getWidth(s), fnt:getHeight()
+        cursorx = cursorx + w + self.theme.margin
+        if cursory == 0 then cursory = h end
+        table.insert(ps, { v = s, w = w, h = h })
+      end
+      local w = cursorx - startx + self.theme.margin / 2
+      local h = cursory - starty
+
+      ui:rpanel(w, h, label)
+
+      for i = 1, #ps do
+        local p = ps[i]
+        if type(p.v) ~= "table" then
+          local text = tostring(p.v)
+          art.text(text, font, self.cursor.x, self.cursor.y):color_(White)
+          self:move_cursor(p.w, p.h)
+        end
+      end
+    else
+      
+      for k, v in pairs(tbl) do
+        if type(v) ~= "table" then
+          local key, value = font:getWidth(k), font:getWidth(tostring(v))
+          art.text(k, font, self.cursor.x, self.cursor.y):color_(White):layer_(0.1)
+          self.cursor.x = self.cursor.x + key
+          art.text(tostring(v), font, self.cursor.x, self.cursor.y):color_(White):layer_(0.1)
+          self.cursor.x = self.cursor.x - key
+          self.cursor.y = self.cursor.y + font:getHeight()
+        end
+      end
+
+    end
+
   end
 
   function ui:button(text)

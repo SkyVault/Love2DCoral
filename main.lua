@@ -3,7 +3,14 @@ local actors = coral.actors
 local component = actors.component
 local art, timer, clock, ui = coral.art, coral.timer, coral.clock, coral.ui
 
-print(v2(1, 1), v2(12, 32) + v2(23, 4))
+local a_random_table = {
+  hello = "world",
+  [420] = { 1, 2, 3, { four = true } },
+}
+
+print(coral.vault.write(a_random_table))
+
+--print(v2(1, 1), v2(12, 32) + v2(23, 4))
 
 local rot = 0
 local _dt = 0
@@ -47,13 +54,6 @@ coral.sys.load(function()
     end)
   end)
 
-  local a_random_table = coral.vault.table {
-    hello = "world",
-    [420] = { 1, 2, 3, { four = true } },
-  }
-
-  print(a_random_table)
-
   local player = coral.actors.spawn(
     Spatial:new { x = 32, y = 200 },
     Drawable:new { }
@@ -77,6 +77,10 @@ local t = false
 coral.sys.update(function(dt)
   --rot = rot + dt
   --_dt = dt
+
+  coral.watch(a_random_table, "r")
+  --coral.watch(dt, "dt")
+  --coral.watch({ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, "numbers")
 
   ui:push_container(10, 10, love.graphics.getWidth()  - 20, love.graphics.getHeight() - 20)
   for i = 1, 100 do

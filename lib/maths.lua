@@ -154,6 +154,4 @@ return function(vault)
 
     return m
   end
-
-  print(v2(1, 2), v3(3, 4, 5))
 end

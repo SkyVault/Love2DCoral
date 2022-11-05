@@ -17,8 +17,11 @@ return function(base_path, love)
     return try_require(loc) or try_require("lib.Coral." .. loc) or try_require("Coral." .. loc)
   end
 
-  local function create_coral()
+  local function hash(v)
+    return love.data.encode("string", "hex", love.data.hash("md5", tostring(v)))
+  end
 
+  local function create_coral()
     local vault = _require("lib.vault")
 
     _require("lib.maths")(vault)
@@ -36,9 +39,9 @@ return function(base_path, love)
     local art = _require("lib.artist")(love, enums.enum, sys, tools, game_camera, pp)
     local timers = _require("lib.timers")(sys)
     local clock = _require("lib.clock")(vault)
-    local watchers = _require("lib.watchers")(sys)
     local input = _require("lib.input")(love, sys, tools.set)
-    local ui = _require("lib.ui")(love, sys, art, tools, input, vault)
+    local ui = _require("lib.ui")(love, sys, art, tools, input, vault, palette)
+    local watch = _require("lib.watchers")(sys, ui, hash)
     local tween = _require("lib.tweens")(sys, tools)
     local assets = _require("lib.assets")(love)
 
@@ -56,6 +59,9 @@ return function(base_path, love)
       input = input,
       tween = tween,
       assets = assets,
+      watch = watch,
+
+      hash = hash,
 
       clock = clock:new(),
 

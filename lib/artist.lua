@@ -128,6 +128,7 @@ return function(love, enum, sys, tools, camera, pp)
       color = {1, 1, 1, 1},
       layer = 0,
       context = context,
+      corner_radius = 0,
     }
     add_pic(res)
     return res
@@ -271,7 +272,7 @@ return function(love, enum, sys, tools, camera, pp)
         kinds.case(p.kind) {
           [kinds.rectangle] = function()
             love.graphics.setColor(p.color)
-            love.graphics.rectangle("fill", p.x, p.y, p.w, p.h)
+            love.graphics.rectangle("fill", p.x, p.y, p.w, p.h, p.corner_radius, p.corner_radius, p.corner_radius > 0 and p.corner_radius or nil)
           end,
 
           [kinds.line_rectangle] = function()
