@@ -1,4 +1,4 @@
-local coral = require("coral")(nil, love)
+local coral = require("coral")(love)
 local actors = coral.actors
 local component = actors.component
 local art, timer, clock, ui = coral.art, coral.timer, coral.clock, coral.ui

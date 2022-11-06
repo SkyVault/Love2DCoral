@@ -1,24 +1,19 @@
-local _PATH = (...):match('^(.*[%./])[^%.%/]+$') or ''
+local base_path = (...):match('^(.*[%./])[^%.%/]+$') or ''
 
-print("PATH: ", _PATH)
-
-return function(base_path, love)
+return function(love)
   love = love or _G["love"]
 
   assert(love, "Missing love")
 
   local function _require(loc)
     local b = base_path or ""
-    if b ~= "" then
-      loc = b .. "." .. loc
-    end
-
+    if b ~= "" then loc = b .. loc end
     local function try_require(p)
       local ok, value = pcall(function() return require(p) end)
       if ok then return value else return nil end
     end
 
-    return try_require(loc) or try_require("lib.Coral." .. loc) or try_require("Coral." .. loc)
+    return try_require(loc)
   end
 
   local function hash(v)
