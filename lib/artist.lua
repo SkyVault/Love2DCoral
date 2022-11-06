@@ -53,7 +53,7 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords) {
 }
 ]]
 
-return function(love, enum, sys, tools, camera, pp)
+return function(love, enum, sys, tools, camera, pp, vault)
   local contexts = enum {
     "normal",
     "ui"
@@ -72,6 +72,15 @@ return function(love, enum, sys, tools, camera, pp)
 
   local _context_stack = {}
   local context = contexts.normal
+
+  local camera2ds = {}
+
+  local function add_camera_2d(cam, make_active)
+     table.insert(
+       camera2ds,
+       vault.ext(cam, { is_active = make_active or cam.is_active })
+     )
+  end
 
   local function set_context(to)
     context = to
@@ -233,13 +242,26 @@ return function(love, enum, sys, tools, camera, pp)
     mesh.plane = build_mesh(mesh.verts.plane(1))
   end
 
+  local function active_camera_2d()
+    local active_camera = nil
+    for i = 1, #camera2ds do
+      if camera2ds[i].is_active then
+        active_camera = camera2ds[i]
+        break
+      end
+    end
+    return active_camera
+  end
+
   local x = 0
 
   local function final_draw()
     x = x + 0.01
+
     --table.sort(pics, function(a, b)
       --return a.layer < b.layer
     --end)
+    local cam2d = active_camera_2d()
 
     local init_color = { love.graphics.getColor() }
 
@@ -270,6 +292,8 @@ return function(love, enum, sys, tools, camera, pp)
     end
 
     love.graphics.setShader()
+ 
+    if cam2d then cam2d:start() end
 
     for ctx, ps in pairs(pics) do
       for i = 1, #ps do
@@ -317,6 +341,7 @@ return function(love, enum, sys, tools, camera, pp)
     end
 
     love.graphics.setColor(init_color)
+    if cam2d then cam2d:stop() end
 
     pics = {}
     pics_3d = {}
@@ -335,6 +360,8 @@ return function(love, enum, sys, tools, camera, pp)
     with_context = with_context,
 
     build_mesh = build_mesh,
+
+    add_camera_2d = add_camera_2d,
 
     draw = draw,
     pic = pic,

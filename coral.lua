@@ -1,3 +1,7 @@
+local _PATH = (...):match('^(.*[%./])[^%.%/]+$') or ''
+
+print("PATH: ", _PATH)
+
 return function(base_path, love)
   love = love or _G["love"]
 
@@ -29,14 +33,16 @@ return function(base_path, love)
     local palette = _require("lib.palette")
     local pp = _require("lib.pprint")
     local tools = _require("lib.tools")
+
     local camera = _require("lib.camera")(love, vault)
+    local camera2d = _require("lib.camera2d")(love, vault)
 
     local game_camera = camera:new {  }
 
     local sys = _require("lib.systems")
     local enums = _require("lib.enums")
     local actors = _require("lib.actors")(tools, vault)
-    local art = _require("lib.artist")(love, enums.enum, sys, tools, game_camera, pp)
+    local art = _require("lib.artist")(love, enums.enum, sys, tools, game_camera, pp, vault)
     local timers = _require("lib.timers")(sys)
     local clock = _require("lib.clock")(vault)
     local input = _require("lib.input")(love, sys, tools.set)
@@ -60,6 +66,8 @@ return function(base_path, love)
       tween = tween,
       assets = assets,
       watch = watch,
+
+      camera2d = camera2d,
 
       hash = hash,
 
