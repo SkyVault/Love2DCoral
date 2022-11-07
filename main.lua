@@ -96,7 +96,7 @@ coral.sys.update(function(dt)
   --end
   --ui:pop_container()
 
-  ui:push_container(panel.x, 100, 200, 200)
+  ui:push_container(panel.x, 300, 200, 200)
   ui:panel(200, 250)
 
   ui:push_theme { fg_color = Red }
@@ -140,9 +140,9 @@ coral.sys.draw(function()
     ):color_(coral.palette.next_bright_color())
   end
 
-  coral.actors.each({ Spatial, Drawable }, function(_, spatial, drawable)
-    art.rect(200, 200, 32, 32):color_(Tan)
-  end)
+  --coral.actors.each({ Spatial, Drawable }, function(_, spatial, drawable)
+    --art.rect(200, 200, 32, 32):color_(Tan)
+  --end)
 end)
 
 coral.sys.draw(function()

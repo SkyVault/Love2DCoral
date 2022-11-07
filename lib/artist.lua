@@ -74,6 +74,7 @@ return function(love, enum, sys, tools, camera, pp, vault)
   local context = contexts.normal
 
   local camera2ds = {}
+  local layer = 0
 
   local function add_camera_2d(cam, make_active)
      table.insert(
@@ -138,11 +139,12 @@ return function(love, enum, sys, tools, camera, pp, vault)
       x = x, y = y, w = w, h = h,
       rotation = 0,
       color = {1, 1, 1, 1},
-      layer = 0,
+      layer = layer,
       context = context,
       corner_radius = 0,
     }
     add_pic(res)
+    layer = layer + 0.001
     return res
   end
 
@@ -298,7 +300,11 @@ return function(love, enum, sys, tools, camera, pp, vault)
     local cam2d = active_camera_2d()
 
     for ctx, ps in pairs(pcs) do
+      table.sort(ps, function(a, b)
+        return a.layer < b.layer
+      end)
       for i = 1, #ps do
+
         local p = ps[i]
         kinds.case(p.kind) {
           [kinds.crop] = function()
@@ -366,10 +372,6 @@ return function(love, enum, sys, tools, camera, pp, vault)
   local function final_draw()
     x = x + 0.01
 
-    table.sort(pics, function(a, b)
-      return a.layer < b.layer
-    end)
-
     local cam2d = active_camera_2d()
 
     local init_color = { love.graphics.getColor() }
@@ -401,7 +403,7 @@ return function(love, enum, sys, tools, camera, pp, vault)
     end
 
     love.graphics.setShader()
- 
+
     if cam2d then cam2d:start() end
 
     draw_pictures(pics)
@@ -411,6 +413,7 @@ return function(love, enum, sys, tools, camera, pp, vault)
 
     pics = {}
     pics_3d = {}
+    layer = 0
   end
 
   sys.load(load)

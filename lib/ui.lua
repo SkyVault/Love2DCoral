@@ -11,6 +11,8 @@ return function(love, sys, art, tools, input, vault, palette)
     containers = {},
     max_height = 0,
 
+    style_stack = {},
+
     windows = {},
   }
 
@@ -25,6 +27,26 @@ return function(love, sys, art, tools, input, vault, palette)
     table.insert(self.containers, { x, y, width, height })
   end
 
+  function ui:style(style)
+    for i = #self.style_stack, 1, -1 do
+      local s = self.style_stack[i]
+      if s == style then
+        return true
+      end
+    end
+    return false
+  end
+
+  function ui:grow_width()
+    table.insert(self.style_stack, "grow_width")
+    return self
+  end
+
+  function ui:text_underline()
+    table.insert(self.style_stack, "text_underline")
+    return self
+  end
+
   function ui:pop_container()
     table.remove(self.containers, #self.containers)
   end
@@ -33,8 +55,9 @@ return function(love, sys, art, tools, input, vault, palette)
     return ext({
       bg_color = {0.2, 0.2, 0.2, 0.95},
       fg_color =  LightGray,
-      font = love.graphics.newFont(18),
+      font = love.graphics.newFont("res/Monoid Retina Nerd Font Complete Mono.ttf"),
       title_font = love.graphics.newFont(24),
+      text_color = White,
       margin = 8,
       padding = 8,
     }, overrides or {})
@@ -104,7 +127,7 @@ return function(love, sys, art, tools, input, vault, palette)
         self.cursor.x + ui.theme.margin,
         self.cursor.y + 6
       )
-      :color_(White)
+      :color_(ui.theme.text_color)
       self.cursor.y = self.cursor.y + h
     end
 
@@ -119,7 +142,7 @@ return function(love, sys, art, tools, input, vault, palette)
   function ui:label(text)
     local fnt, w, h = self.theme.font, self:measure_text(text)
     ui:next_size(w, h)
-    art.text(text, self.theme.font, self.cursor.x, self.cursor.y):color_(White)
+    art.text(text, self.theme.font, self.cursor.x, self.cursor.y):color_(ui.theme.text_color)
     self:move_cursor(w, h)
   end
 
@@ -154,15 +177,15 @@ return function(love, sys, art, tools, input, vault, palette)
         :color_(Orange)
         :layer_(1000)
       art.paragraph(str, font, win.x, win.y, win.w, "left")
-        :color_(White)
+        :color_(ui.theme.text_color)
         :layer_(1000)
     end)
   end
 
   function ui:button(text)
     local fnt, w, h = self.theme.font, self:measure_text(text)
-    ui:next_size(w, h)
-    local ox, oy = self.cursor.x, self.cursor.y
+    local _, _, cw, _ = table.unpack(self:container())
+    if ui:style "grow_width" then w = cw end
 
     local hot = self:is_hot(w, h)
     local old = ui.theme.bg_color
@@ -171,13 +194,30 @@ return function(love, sys, art, tools, input, vault, palette)
     if hot then ui.theme.bg_color = { 0.4, 0.4, 0.45, 0.99 } end
     if hot and ml then ui.theme.bg_color = { 0.4, 0.4, 0.85, 0.99 } end
 
-    self:next_size(w, h)
-    art.rect(self.cursor.x + 4, self.cursor.y + 4, w, h):color_({0, 0, 0, 0.5})
-    art.rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.bg_color)
-    art.line_rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.fg_color)
-    self:move_cursor(w, h)
+    if ui:style "text_underline" then
+      local fg = hot and Maroon or ui.theme.text_color
+      art.text(
+        text, fnt, self.cursor.x + self.theme.padding / 2, self.cursor.y + self.theme.padding / 2
+      ):color_(fg):layer_(1.1)
+      art.rect(self.cursor.x, self.cursor.y + h - 2, w, 2):color_(fg):layer_(1.0)
+    else
+      art.rect(self.cursor.x, self.cursor.y, w, h)
+        :color_(self.theme.bg_color)
+        :corner_radius_(4)
+        :layer_(1.0)
 
-    art.text(text, fnt, ox + self.theme.padding / 2, oy + self.theme.padding / 2):color_(White)
+      art.line_rect(self.cursor.x, self.cursor.y, w, h)
+        :color_(self.theme.fg_color)
+        :corner_radius_(4)
+        :layer_(1.05)
+
+      art.text(
+        text, fnt, self.cursor.x + self.theme.padding / 2, self.cursor.y + self.theme.padding / 2
+      ):color_(ui.theme.text_color):layer_(1.1)
+    end
+
+    self:move_cursor(w, h)
+    self:next_size(w, h)
 
     if hot then ui.theme.bg_color = old end
     return hot and input.is_mouse_pressed(1)
@@ -201,7 +241,7 @@ return function(love, sys, art, tools, input, vault, palette)
     art.line_rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.fg_color)
     self:move_cursor(w, h)
 
-    art.text(text, fnt, ox + self.theme.padding / 2, oy + self.theme.padding / 2):color_(White)
+    art.text(text, fnt, ox + self.theme.padding / 2, oy + self.theme.padding / 2):color_(ui.theme.text_color)
 
     if hot or checked then ui.theme.bg_color = old end
 
@@ -217,7 +257,15 @@ return function(love, sys, art, tools, input, vault, palette)
     local win = ui.windows[label]
 
     if ui.windows[label] == nil then
-      ui.windows[label] = { w = w or 200, h = h or 200, x = 32, y = 32, mx = 0, my = 0 }
+      ui.windows[label] = {
+        show_menu = false,
+        w = w or 200,
+        h = h or 200,
+        x = 32,
+        y = 32,
+        mx = 0,
+        my = 0
+      }
       win = ui.windows[label]
     end
 
@@ -228,6 +276,42 @@ return function(love, sys, art, tools, input, vault, palette)
     if input.is_mouse_pressed(1) and move_hot then
       win.mx, win.my = love.mouse.getX(), love.mouse.getY()
       win.dragging = true
+    end
+
+    if input.is_mouse_pressed(2) and move_hot then
+      win.show_menu = not win.show_menu
+    end
+
+    if input.is_mouse_pressed(1) and not move_hot then
+      win.show_menu = false
+    end
+
+    if win.show_menu then
+      local xx, yy = sx - 64, sy + 8
+      ui:push_container(xx + 8, yy + 8, 128 + 16, 128 + 64)
+      art.rect(xx, yy, 128 + 32, 128 + 64)
+        :corner_radius_(6)
+        :color_({ 1, 1, 1, 0.8 })
+        :layer_(1)
+
+      local th = ui.theme
+
+      local fg, bg, tc = th.fg_color, th.bg_color, th.text_color
+
+      th.text_color = Black
+      th.bg_color = White
+      th.fg_color = { 0.8, 0.8, 0.8, 0.7 }
+      ui:grow_width():text_underline()
+      ui:button("close")
+
+      ui:grow_width(); ui:button("top-left")
+      ui:grow_width(); ui:button("top-right")
+      ui:grow_width(); ui:button("bottom-left")
+      ui:grow_width(); ui:button("bottom-right")
+
+      th.fg_color, th.bg_color, th.text_color = fg, bg, tc
+
+      ui:pop_container()
     end
 
     if input.is_mouse_down(1) then
@@ -249,11 +333,11 @@ return function(love, sys, art, tools, input, vault, palette)
 
     ui:push_container(win.x, win.y, cw, ch)
 
-    art.line(sx, sy, sx + 32, cy - 4)
-
     if move_hot then
-      art.line(sx - 2, sy - 2, sx + 34, sy - 2)
-      art.line(sx - 2, sy + 2, sx + 34, sy + 2)
+      love.mouse.setCursor(love.mouse.getSystemCursor("hand"))
+      art.rect(sx - 2, sy - 4, 34, 8):corner_radius_(4)
+    else
+      art.line(sx, sy, sx + 32, cy - 4)
     end
 
     art.crop(cx, cy, cw, ch, function()
@@ -281,11 +365,16 @@ return function(love, sys, art, tools, input, vault, palette)
     end
 
     if resize_hot then
+      love.mouse.setCursor(love.mouse.getSystemCursor("hand"))
       art.rect(cx + cw - 4 - 9, cy + ch - 4 - 2, 18, 4):color_(White):corner_radius_(3)
       art.rect(cx + cw - 4 - 2, cy + ch - 4 - 9, 4, 18):color_(White):corner_radius_(3)
     else
       art.rect(cx + cw - 4 - 7, cy + ch - 4 - 2, 14, 4):color_({ 0.9, 0.9, 0.9, 1.0 }):corner_radius_(2)
       art.rect(cx + cw - 4 - 2, cy + ch - 4 - 7, 4, 14):color_({ 0.9, 0.9, 0.9, 1.0 }):corner_radius_(2)
+    end
+
+    if not resize_hot and not move_hot then
+      love.mouse.setCursor(love.mouse.getSystemCursor("arrow"))
     end
 
     ui:pop_container()
@@ -325,6 +414,7 @@ return function(love, sys, art, tools, input, vault, palette)
 
   local function draw()
     ui.cursor = v2()
+    ui.style_stack = {}
   end
 
   sys.load(load)

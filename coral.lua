@@ -121,7 +121,7 @@ return function(love)
   end
 
   love.draw = function()
-    love.graphics.setLineWidth(4)
+    love.graphics.setLineWidth(2)
     coral:draw()
 
     if _love.draw then
