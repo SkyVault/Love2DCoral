@@ -10,6 +10,8 @@ return function(love, sys, art, tools, input, vault, palette)
     theme = {},
     containers = {},
     max_height = 0,
+
+    windows = {},
   }
 
   function ui:container()
@@ -111,6 +113,9 @@ return function(love, sys, art, tools, input, vault, palette)
       :corner_radius_(8)
   end
 
+  function ui:paragraph(text)
+  end
+
   function ui:label(text)
     local fnt, w, h = self.theme.font, self:measure_text(text)
     ui:next_size(w, h)
@@ -142,45 +147,16 @@ return function(love, sys, art, tools, input, vault, palette)
 
   function ui:table(tbl, label)
     local ps, font = {}, self.theme.font
+    local str = vault.write(tbl, true)
 
-    if #tbl > 0 then
-      local startx, cursorx = 0, 0
-      local starty, cursory = 0, 0
-      for i = 1, #tbl do
-        local s, fnt = tostring(tbl[i]), ui.theme.font
-        local w, h = fnt:getWidth(s), fnt:getHeight()
-        cursorx = cursorx + w + self.theme.margin
-        if cursory == 0 then cursory = h end
-        table.insert(ps, { v = s, w = w, h = h })
-      end
-      local w = cursorx - startx + self.theme.margin / 2
-      local h = cursory - starty
-
-      ui:rpanel(w, h, label)
-
-      for i = 1, #ps do
-        local p = ps[i]
-        if type(p.v) ~= "table" then
-          local text = tostring(p.v)
-          art.text(text, font, self.cursor.x, self.cursor.y):color_(White)
-          self:move_cursor(p.w, p.h)
-        end
-      end
-    else
-      
-      for k, v in pairs(tbl) do
-        if type(v) ~= "table" then
-          local key, value = font:getWidth(k), font:getWidth(tostring(v))
-          art.text(k, font, self.cursor.x, self.cursor.y):color_(White):layer_(0.1)
-          self.cursor.x = self.cursor.x + key
-          art.text(tostring(v), font, self.cursor.x, self.cursor.y):color_(White):layer_(0.1)
-          self.cursor.x = self.cursor.x - key
-          self.cursor.y = self.cursor.y + font:getHeight()
-        end
-      end
-
-    end
-
+    ui:window(label, 400, 300, 200, 200, function(win)
+      art.paragraph(str, font, win.x, win.y, win.w, "left")
+        :color_(Orange)
+        :layer_(1000)
+      art.paragraph(str, font, win.x, win.y, win.w, "left")
+        :color_(White)
+        :layer_(1000)
+    end)
   end
 
   function ui:button(text)
@@ -234,6 +210,85 @@ return function(love, sys, art, tools, input, vault, palette)
     else
       return checked
     end
+  end
+
+  function ui:window(label, x, y, w, h, body)
+    local ps, font = {}, self.theme.font
+    local win = ui.windows[label]
+
+    if ui.windows[label] == nil then
+      ui.windows[label] = { w = w or 200, h = h or 200, x = 32, y = 32, mx = 0, my = 0 }
+      win = ui.windows[label]
+    end
+
+    local cx, cy, cw, ch = win.x, win.y, win.w, win.h
+    local sx, sy = cx + cw / 2 - 16, cy - 4
+    local move_hot = point_intersects_rect(v2(love.mouse.getX(), love.mouse.getY()), { x = sx, y = sy - 2, width = 32, height = 12 })
+
+    if input.is_mouse_pressed(1) and move_hot then
+      win.mx, win.my = love.mouse.getX(), love.mouse.getY()
+      win.dragging = true
+    end
+
+    if input.is_mouse_down(1) then
+      if win.dragging then
+        local mx, my = love.mouse.getX(), love.mouse.getY()
+        local dx, dy = win.mx - mx, win.my - my
+        win.x = win.x - dx
+        win.y = win.y - dy
+        win.mx, win.my = mx, my
+      end
+    else
+      win.dragging = false
+    end
+    win.w = math.max(win.w, 64)
+    win.h = math.max(win.h, 64)
+
+    cx, cy, cw, ch = win.x, win.y, win.w, win.h
+    sx, sy = cx + cw / 2 - 16, cy - 4
+
+    ui:push_container(win.x, win.y, cw, ch)
+
+    art.line(sx, sy, sx + 32, cy - 4)
+
+    if move_hot then
+      art.line(sx - 2, sy - 2, sx + 34, sy - 2)
+      art.line(sx - 2, sy + 2, sx + 34, sy + 2)
+    end
+
+    art.crop(cx, cy, cw, ch, function()
+      art.rect(cx, cy, cw, ch):color_({ 0.2, 0.1, 0, 0.5 }):corner_radius_(8)
+      art.line_rect(cx, cy, cw, ch):corner_radius_(8)
+      body(win)
+    end)
+
+    local resize_hot = point_intersects_rect(v2(love.mouse.getX(), love.mouse.getY()), { x = cx + cw - 4 - 7, y = cy + ch - 4 - 7, width = 24, height = 24 })
+
+    if input.is_mouse_pressed(1) and resize_hot then
+      win.mx, win.my = love.mouse.getX(), love.mouse.getY()
+      win.resizing = true
+    end
+
+    if input.is_mouse_down(1) then
+      if win.resizing then
+        local mx, my = love.mouse.getX(), love.mouse.getY()
+        local dx, dy = win.mx - mx, win.my - my
+        win.w, win.h = win.w - dx, win.h - dy
+        win.mx, win.my = mx, my
+      end
+    else
+      win.dragging = false
+    end
+
+    if resize_hot then
+      art.rect(cx + cw - 4 - 9, cy + ch - 4 - 2, 18, 4):color_(White):corner_radius_(3)
+      art.rect(cx + cw - 4 - 2, cy + ch - 4 - 9, 4, 18):color_(White):corner_radius_(3)
+    else
+      art.rect(cx + cw - 4 - 7, cy + ch - 4 - 2, 14, 4):color_({ 0.9, 0.9, 0.9, 1.0 }):corner_radius_(2)
+      art.rect(cx + cw - 4 - 2, cy + ch - 4 - 7, 4, 14):color_({ 0.9, 0.9, 0.9, 1.0 }):corner_radius_(2)
+    end
+
+    ui:pop_container()
   end
 
   function ui:image_button(image)

@@ -1,11 +1,12 @@
 local coral = require("coral")(love)
 local actors = coral.actors
 local component = actors.component
-local art, timer, clock, ui = coral.art, coral.timer, coral.clock, coral.ui
+local art, timer, clock, ui, vault = coral.art, coral.timer, coral.clock, coral.ui, coral.vault
 
-local a_random_table = {
+local a_random_table = vault.table {
   hello = "world",
   [420] = { 1, 2, 3, { four = true } },
+  pos = v2(45, 3.14159)
 }
 
 print(coral.vault.write(a_random_table))
@@ -23,7 +24,9 @@ local Drawable = component("Drawable") {
   pic = coral.art.pic(coral.art.kinds.rectangle, 10, 10, 100, 100),
 }
 
-local panel = { x = 0 }
+local panel = vault.table {
+  x = 0,
+}
 
 local texture = nil
 
@@ -49,10 +52,13 @@ coral.sys.load(function()
 
   coral.assets.load_image("floor", "res/floor.png"):setFilter("nearest", "nearest")
 
-  coral.tween.new(1, panel, { x = 200 }):start():on_complete_(function()
-    coral.tween.new(1, panel, { x = 0 }):start():on_complete_(function()
-    end)
-  end)
+  local do_tween = 0
+  do_tween = function(dir)
+    coral.tween.new(1, panel, { x = 200 * ((dir or 1) >= 1 and 1 or 0) })
+      :start()
+      :on_complete(function() do_tween((dir or 1) * -1) end)
+  end
+  do_tween()
 
   coral.actors.spawn(
     Spatial:new { x = 32, y = 200 },
@@ -68,23 +74,27 @@ coral.sys.load(function()
       end)
     end)
   end)
+
+  --coral.watch(panel, "tween")
 end)
 
 local t = false
 
+
+print(coral)
 coral.sys.update(function(dt)
   --rot = rot + dt
   --_dt = dt
 
-  coral.watch(a_random_table, "r")
+  coral.watch(a_random_table, true)
   --coral.watch(dt, "dt")
   --coral.watch({ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, "numbers")
 
-  ui:push_container(10, 10, love.graphics.getWidth()  - 20, love.graphics.getHeight() - 20)
-  for i = 1, 100 do
-    ui:button(tostring(i))
-  end
-  ui:pop_container()
+  --ui:push_container(10, 10, love.graphics.getWidth()  - 20, love.graphics.getHeight() - 20)
+  --for i = 1, 100 do
+    --ui:button(tostring(i))
+  --end
+  --ui:pop_container()
 
   ui:push_container(panel.x, 100, 200, 200)
   ui:panel(200, 250)
@@ -104,9 +114,6 @@ coral.sys.update(function(dt)
   end
 
   ui:newline()
-
-  ui:label("Hello")
-  ui:title("Hello World!")
 
   t = ui:toggle("Toggle Me", t)
 

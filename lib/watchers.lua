@@ -5,13 +5,19 @@ return function(sys, ui, hash)
 
   local function update(dt)
     for k, v in pairs(watchers.xs) do
-      local w, h, val = v.width, v.height, v.value
-      ui:push_container(400, 300, 400, 300)
 
-      if type(v.value) ~= "table" then
+      local w, h, val = v.width, v.height, v.value
+
+      --local font = ui.theme.font
+      --local ww = font:getWi
+      --tostring(val)
+
+      ui:push_container(0, 0, w, h)
+
+      if type(val) ~= "table" then
         ui:title(tostring(val))
       else
-        ui:table(v.value, k)
+        ui:table(val, k)
       end
 
       ui:pop_container()

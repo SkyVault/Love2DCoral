@@ -33,6 +33,7 @@ return function(vault)
       else error("v2.__add expects second arg to be v2 or number but got: ", type(b))
       end
     end,
+    distance_to = function(self, other) return sqrt((other.x - self.x)^2 + (other.y - self.y)^2) end,
   }
 
   local _v3 = vault.table("v3") {
@@ -67,7 +68,7 @@ return function(vault)
     magnitude = function(self) return math.sqrt(self.x ^ 2 + self.y ^ 2 + self.z ^ 2) end,
     dot = function(self, other) return self.x * other.x + self.y * other.y + self.z * other.z end,
     scaler_mult = function(sc, a, b, c) return a*sc, b*sc, c*sc end,
-    distance_to = function(self, other) return sqrt((other.x - self.x)^2 + (other.y - self.y)^2) end,
+    distance_to = function(self, other) return sqrt((other.x - self.x)^2 + (other.y - self.y)^2 + (other.z - self.z)^2) end,
     normalized = function(self)
       local mag = self:magnitude()
       return mag == 0 and v3() or v3(self.x / mag, self.y / mag, self.z / mag)

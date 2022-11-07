@@ -130,9 +130,7 @@ return function(tools, vault)
             goto continue
           end
         end
-
         table.insert(res, actor)
-
         ::continue::
       end
       views[k] = res

@@ -31,6 +31,10 @@ return function(love, sys, set)
     return now and not last
   end
 
+  local function is_mouse_down(b)
+    return love.mouse.isDown(b)
+  end
+
   local function is_mouse_released(b)
     local now, last = love.mouse.isDown(b), mouses[b]
     return not now and last
@@ -54,6 +58,7 @@ return function(love, sys, set)
     is_up = is_up,
     is_pressed = is_pressed,
     is_released = is_released,
+    is_mouse_down = is_mouse_down,
     is_mouse_pressed = is_mouse_pressed,
     is_mouse_released = is_mouse_released,
   }

@@ -113,7 +113,9 @@ return function(love, enum, sys, tools, camera, pp, vault)
     "line",
     "image",
     "text",
+    "paragraph",
     "plane",
+    "crop",
   }
 
   local function plane_vertices(s, x, y, z)
@@ -207,6 +209,22 @@ return function(love, enum, sys, tools, camera, pp, vault)
     return p
   end
 
+  local function paragraph(txt, fnt, x, y, limit, align)
+    local w, h = fnt:getWidth(txt), fnt:getHeight()
+    local p = pic(kinds.paragraph, x, y, w, h)
+    p.text = txt
+    p.font = fnt
+    p.limit = limit
+    p.aligh = align
+    return p
+  end
+
+  local function crop(x, y, w, h, fn)
+    local p = pic(kinds.crop, x, y, w, h)
+    p.callback = fn
+    return p
+  end
+
   local function plane(translation, rotation, scle)
     return pic3d(kinds.plane, translation, rotation, scle)
   end
@@ -253,14 +271,105 @@ return function(love, enum, sys, tools, camera, pp, vault)
     return active_camera
   end
 
+  local function to_world_coords(x, y)
+    local cam = active_camera_2d()
+    if not cam then return x, y end
+    local hw, hh = love.graphics.getWidth() / 2, love.graphics.getHeight() / 2
+    --local c, s = cos(cam.rotation), sin(cam.rotation)
+    --local xx, yy = (x - hw) / cam.scale, (y - hh) / cam.scale
+    --xx, yy = c*xx - s*yy, s*xx + c*yy
+    return x - cam.position.x - hw, y - cam.position.y - hh
+  end
+
+  local function to_camera_coords(x, y)
+    local cam = active_camera_2d()
+    if not cam then return x, y end
+    local hw, hh = love.graphics.getWidth() / 2, love.graphics.getHeight() / 2
+    local c, s = cos(cam.rotation), sin(cam.rotation)
+    local xx, yy = x - cam.position.x, y - cam.position.y
+    xx, yy = c*xx - s*yy, s*xx + c*yy
+    return xx * cam.scale + hw, yy * cam.scale + hh
+  end
+
+
   local x = 0
+
+  local function draw_pictures(pcs)
+    local cam2d = active_camera_2d()
+
+    for ctx, ps in pairs(pcs) do
+      for i = 1, #ps do
+        local p = ps[i]
+        kinds.case(p.kind) {
+          [kinds.crop] = function()
+            local _pics = pics
+            pics = {}
+            if p.callback then p.callback() end
+
+            if cam2d then cam2d:stop() end
+            love.graphics.setScissor(p.x, p.y, p.w, p.h)
+            draw_pictures(pics)
+            love.graphics.setScissor()
+            if cam2d then cam2d:start() end
+
+            pics = _pics
+          end,
+
+          [kinds.line] = function()
+            local x1, y1, x2, y2 = p.x, p.y, p.w, p.h
+
+            love.graphics.setColor(p.color)
+            love.graphics.line(x1, y1, x2, y2)
+          end,
+
+          [kinds.rectangle] = function()
+            love.graphics.setColor(p.color)
+            love.graphics.rectangle("fill", p.x, p.y, p.w, p.h, p.corner_radius, p.corner_radius, p.corner_radius > 0 and p.corner_radius or nil)
+          end,
+
+          [kinds.line_rectangle] = function()
+            love.graphics.setColor(p.color)
+            love.graphics.rectangle("line", p.x, p.y, p.w, p.h, p.corner_radius, p.corner_radius, p.corner_radius > 0 and p.corner_radius or nil)
+          end,
+
+          [kinds.circle] = function()
+            love.graphics.setColor(p.color)
+            love.graphics.circle("fill", p.x, p.y, p.w)
+          end,
+
+          [kinds.line_circle] = function()
+            love.graphics.setColor(p.color)
+            love.graphics.circle("line", p.x, p.y, p.w)
+          end,
+
+          [kinds.image] = function()
+            love.graphics.setColor(p.color)
+            love.graphics.draw(p.image, p.x, p.y)
+          end,
+
+          [kinds.text] = function()
+            love.graphics.setColor(p.color)
+            love.graphics.setFont(p.font)
+            love.graphics.print(p.text, p.x, p.y, p.rotation)
+          end,
+
+          [kinds.paragraph] = function()
+            love.graphics.setColor(p.color)
+            love.graphics.setFont(p.font)
+            love.graphics.printf(p.text, p.x, p.y, p.limit, p.align, p.rotation)
+          end,
+        }
+      end
+    end
+  end
 
   local function final_draw()
     x = x + 0.01
 
-    --table.sort(pics, function(a, b)
-      --return a.layer < b.layer
-    --end)
+    table.sort(pics, function(a, b)
+      return a.layer < b.layer
+    end)
+
     local cam2d = active_camera_2d()
 
     local init_color = { love.graphics.getColor() }
@@ -295,50 +404,7 @@ return function(love, enum, sys, tools, camera, pp, vault)
  
     if cam2d then cam2d:start() end
 
-    for ctx, ps in pairs(pics) do
-      for i = 1, #ps do
-        local p = ps[i]
-        kinds.case(p.kind) {
-          [kinds.line] = function()
-            local x1, y1, x2, y2 = p.x, p.y, p.w, p.h
-
-            love.graphics.setColor(p.color)
-            love.graphics.line(x1, y1, x2, y2)
-          end,
-
-          [kinds.rectangle] = function()
-            love.graphics.setColor(p.color)
-            love.graphics.rectangle("fill", p.x, p.y, p.w, p.h, p.corner_radius, p.corner_radius, p.corner_radius > 0 and p.corner_radius or nil)
-          end,
-
-          [kinds.line_rectangle] = function()
-            love.graphics.setColor(p.color)
-            love.graphics.rectangle("line", p.x, p.y, p.w, p.h)
-          end,
-
-          [kinds.circle] = function()
-            love.graphics.setColor(p.color)
-            love.graphics.circle("fill", p.x, p.y, p.w)
-          end,
-
-          [kinds.line_circle] = function()
-            love.graphics.setColor(p.color)
-            love.graphics.circle("line", p.x, p.y, p.w)
-          end,
-
-          [kinds.image] = function()
-            love.graphics.setColor(p.color)
-            love.graphics.draw(p.image, p.x, p.y)
-          end,
-
-          [kinds.text] = function()
-            love.graphics.setColor(p.color)
-            love.graphics.setFont(p.font)
-            love.graphics.print(p.text, p.x, p.y, p.rotation)
-          end,
-        }
-      end
-    end
+    draw_pictures(pics)
 
     love.graphics.setColor(init_color)
     if cam2d then cam2d:stop() end
@@ -363,6 +429,9 @@ return function(love, enum, sys, tools, camera, pp, vault)
 
     add_camera_2d = add_camera_2d,
 
+    to_world_coords = to_world_coords,
+    to_camera_coords = to_camera_coords,
+
     draw = draw,
     pic = pic,
     rect = rect,
@@ -371,6 +440,8 @@ return function(love, enum, sys, tools, camera, pp, vault)
     line_circle = line_circle,
     line = line,
     text = text,
+    paragraph = paragraph,
+    crop = crop,
     image = image,
     plane = plane,
 
