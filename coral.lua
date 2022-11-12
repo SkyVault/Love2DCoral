@@ -41,7 +41,7 @@ return function(love)
     local timers = _require("lib.timers")(sys)
     local clock = _require("lib.clock")(vault)
     local input = _require("lib.input")(love, sys, tools.set)
-    local ui = _require("lib.ui")(love, sys, art, tools, input, vault, palette)
+    local ui = _require("lib.ui")(base_path, love, sys, art, tools, input, vault, palette)
     local watch = _require("lib.watchers")(sys, ui, hash)
     local tween = _require("lib.tweens")(sys, tools)
     local assets = _require("lib.assets")(love)
@@ -61,6 +61,8 @@ return function(love)
       tween = tween,
       assets = assets,
       watch = watch,
+
+      base_path = base_path,
 
       camera2d = camera2d,
 

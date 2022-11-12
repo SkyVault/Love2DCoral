@@ -86,7 +86,10 @@ coral.sys.update(function(dt)
   --rot = rot + dt
   --_dt = dt
 
-  coral.watch(a_random_table, true)
+  coral.watch(a_random_table, "1")
+  coral.watch(a_random_table, "2")
+  coral.watch(a_random_table, "3")
+  coral.watch(a_random_table, "4")
   --coral.watch(dt, "dt")
   --coral.watch({ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, "numbers")
 

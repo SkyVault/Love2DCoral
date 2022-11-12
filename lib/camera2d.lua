@@ -27,7 +27,6 @@ return function(love, vault)
       love.graphics.translate(self.position.x + hw, self.position.y + hh)
       love.graphics.scale(self.scale)
       love.graphics.rotate(self.rotation)
-      --love.graphics.translate(-self.position.x, -self.position.y)
     end,
 
     stop = function(self)

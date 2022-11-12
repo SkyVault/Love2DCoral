@@ -1,4 +1,4 @@
-return function(love, sys, art, tools, input, vault, palette)
+return function(base_path, love, sys, art, tools, input, vault, palette)
   local fmt = string.format
   local ext, aabb = vault.ext, tools.aabb
   local point_intersects_rect = tools.point_intersects_rect
@@ -31,6 +31,7 @@ return function(love, sys, art, tools, input, vault, palette)
     for i = #self.style_stack, 1, -1 do
       local s = self.style_stack[i]
       if s == style then
+        table.remove(self.style_stack, i)
         return true
       end
     end
@@ -55,7 +56,7 @@ return function(love, sys, art, tools, input, vault, palette)
     return ext({
       bg_color = {0.2, 0.2, 0.2, 0.95},
       fg_color =  LightGray,
-      font = love.graphics.newFont("res/Monoid Retina Nerd Font Complete Mono.ttf"),
+      font = love.graphics.newFont(base_path:gsub("%.", "/") .. "res/Monoid Retina Nerd Font Complete Mono.ttf"),
       title_font = love.graphics.newFont(24),
       text_color = White,
       margin = 8,
@@ -111,7 +112,7 @@ return function(love, sys, art, tools, input, vault, palette)
   end
 
   function ui:panel(width, height)
-    art.rect(self.cursor.x, self.cursor.y, width, height):color_(self.theme.bg_color)
+    art.rect(self.cursor.x, self.cursor.y, width, height):color_(self.theme.bg_color):layer_(100)
   end
 
   function ui:rpanel(width, height, title)
@@ -120,6 +121,7 @@ return function(love, sys, art, tools, input, vault, palette)
       art.rect(self.cursor.x, self.cursor.y + 6, w + ui.theme.margin * 2, h + height - 12 + 4)
         :color_({ 0.2, 0.3, 0.4, 1.0 })
         :corner_radius_(8)
+        :layer_(100)
 
       art.text(
         title,
@@ -128,12 +130,14 @@ return function(love, sys, art, tools, input, vault, palette)
         self.cursor.y + 6
       )
       :color_(ui.theme.text_color)
+      :layer_(100)
       self.cursor.y = self.cursor.y + h
     end
 
     art.rect(self.cursor.x, self.cursor.y, width, height)
       :color_(self.theme.bg_color)
       :corner_radius_(8)
+      :layer_(100)
   end
 
   function ui:paragraph(text)
@@ -142,15 +146,15 @@ return function(love, sys, art, tools, input, vault, palette)
   function ui:label(text)
     local fnt, w, h = self.theme.font, self:measure_text(text)
     ui:next_size(w, h)
-    art.text(text, self.theme.font, self.cursor.x, self.cursor.y):color_(ui.theme.text_color)
+    art.text(text, self.theme.font, self.cursor.x, self.cursor.y):color_(ui.theme.text_color):layer_(110)
     self:move_cursor(w, h)
   end
 
   function ui:title(text)
     local fnt, w, h = self.theme.title_font, self:measure_title(text)
     self:newline()
-    art.text(text, self.theme.title_font, self.cursor.x, self.cursor.y + 4):color_(Black)
-    art.text(text, self.theme.title_font, self.cursor.x, self.cursor.y):color_(Tan)
+    art.text(text, self.theme.title_font, self.cursor.x, self.cursor.y + 4):color_(Black):layer_(110)
+    art.text(text, self.theme.title_font, self.cursor.x, self.cursor.y):color_(Tan):layer_(110)
     self:newline(h)
   end
 
@@ -159,7 +163,7 @@ return function(love, sys, art, tools, input, vault, palette)
     local p = self.theme.padding
     local h = 6
     self:newline()
-    art.rect(x + p, self.cursor.y - h + 2, w - p * 2, 2):color_(DarkGray)
+    art.rect(x + p, self.cursor.y - h + 2, w - p * 2, 2):color_(DarkGray):layer_(110)
   end
 
   function ui:newline(height)
@@ -175,10 +179,10 @@ return function(love, sys, art, tools, input, vault, palette)
     ui:window(label, 400, 300, 200, 200, function(win)
       art.paragraph(str, font, win.x, win.y, win.w, "left")
         :color_(Orange)
-        :layer_(1000)
+        :layer_(200)
       art.paragraph(str, font, win.x, win.y, win.w, "left")
         :color_(ui.theme.text_color)
-        :layer_(1000)
+        :layer_(200)
     end)
   end
 
@@ -198,22 +202,22 @@ return function(love, sys, art, tools, input, vault, palette)
       local fg = hot and Maroon or ui.theme.text_color
       art.text(
         text, fnt, self.cursor.x + self.theme.padding / 2, self.cursor.y + self.theme.padding / 2
-      ):color_(fg):layer_(1.1)
-      art.rect(self.cursor.x, self.cursor.y + h - 2, w, 2):color_(fg):layer_(1.0)
+      ):color_(fg):layer_(111)
+      art.rect(self.cursor.x, self.cursor.y + h - 2, w, 2):color_(fg):layer_(110)
     else
       art.rect(self.cursor.x, self.cursor.y, w, h)
         :color_(self.theme.bg_color)
         :corner_radius_(4)
-        :layer_(1.0)
+        :layer_(110)
 
       art.line_rect(self.cursor.x, self.cursor.y, w, h)
         :color_(self.theme.fg_color)
         :corner_radius_(4)
-        :layer_(1.05)
+        :layer_(111)
 
       art.text(
         text, fnt, self.cursor.x + self.theme.padding / 2, self.cursor.y + self.theme.padding / 2
-      ):color_(ui.theme.text_color):layer_(1.1)
+      ):color_(ui.theme.text_color):layer_(111)
     end
 
     self:move_cursor(w, h)
@@ -236,12 +240,12 @@ return function(love, sys, art, tools, input, vault, palette)
     if checked then ui.theme.bg_color = { 0.4, 0.4, 0.85, 0.99 } end
 
     self:next_size(w, h)
-    art.rect(self.cursor.x + 4, self.cursor.y + 4, w, h):color_(Black)
-    art.rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.bg_color)
-    art.line_rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.fg_color)
+    art.rect(self.cursor.x + 4, self.cursor.y + 4, w, h):color_(Black):layer_(110)
+    art.rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.bg_color):layer_(110)
+    art.line_rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.fg_color):layer_(111)
     self:move_cursor(w, h)
 
-    art.text(text, fnt, ox + self.theme.padding / 2, oy + self.theme.padding / 2):color_(ui.theme.text_color)
+    art.text(text, fnt, ox + self.theme.padding / 2, oy + self.theme.padding / 2):color_(ui.theme.text_color):layer_(111)
 
     if hot or checked then ui.theme.bg_color = old end
 
@@ -261,8 +265,8 @@ return function(love, sys, art, tools, input, vault, palette)
         show_menu = false,
         w = w or 200,
         h = h or 200,
-        x = 32,
-        y = 32,
+        x = math.random() * love.graphics.getWidth(),
+        y = math.random() * love.graphics.getHeight(),
         mx = 0,
         my = 0
       }
@@ -282,17 +286,13 @@ return function(love, sys, art, tools, input, vault, palette)
       win.show_menu = not win.show_menu
     end
 
-    if input.is_mouse_pressed(1) and not move_hot then
-      win.show_menu = false
-    end
-
     if win.show_menu then
       local xx, yy = sx - 64, sy + 8
       ui:push_container(xx + 8, yy + 8, 128 + 16, 128 + 64)
       art.rect(xx, yy, 128 + 32, 128 + 64)
         :corner_radius_(6)
         :color_({ 1, 1, 1, 0.8 })
-        :layer_(1)
+        :layer_(110)
 
       local th = ui.theme
 
@@ -304,14 +304,39 @@ return function(love, sys, art, tools, input, vault, palette)
       ui:grow_width():text_underline()
       ui:button("close")
 
-      ui:grow_width(); ui:button("top-left")
-      ui:grow_width(); ui:button("top-right")
-      ui:grow_width(); ui:button("bottom-left")
-      ui:grow_width(); ui:button("bottom-right")
+      local ww, wh = love.graphics.getWidth(), love.graphics.getHeight()
+
+      ui:grow_width():text_underline()
+      if ui:button("top-left") then
+        win.x, win.y = 8, 8
+        win.w, win.h = ww / 2 - 8, wh / 2 - 8
+      end
+
+      ui:grow_width():text_underline()
+      if ui:button("top-right") then
+        win.x, win.y = ww - (ww / 2 - 8), 8
+        win.w, win.h = ww / 2 - 8, wh / 2 - 8
+      end
+
+      ui:grow_width():text_underline()
+      if ui:button("bottom-left") then
+        win.x, win.y = 8, wh / 2 - 8
+        win.w, win.h = ww / 2 - 8, wh / 2 - 8
+      end
+
+      ui:grow_width():text_underline()
+      if ui:button("bottom-right") then
+        win.x, win.y = ww - (ww / 2 - 8), wh / 2 - 8
+        win.w, win.h = ww / 2 - 8, wh / 2 - 8
+      end
 
       th.fg_color, th.bg_color, th.text_color = fg, bg, tc
 
       ui:pop_container()
+    end
+
+    if input.is_mouse_pressed(1) and not move_hot then
+      win.show_menu = false
     end
 
     if input.is_mouse_down(1) then
@@ -340,9 +365,9 @@ return function(love, sys, art, tools, input, vault, palette)
       art.line(sx, sy, sx + 32, cy - 4)
     end
 
-    art.crop(cx, cy, cw, ch, function()
-      art.rect(cx, cy, cw, ch):color_({ 0.2, 0.1, 0, 0.5 }):corner_radius_(8)
-      art.line_rect(cx, cy, cw, ch):corner_radius_(8)
+    art.crop(cx, cy, cw + 2, ch + 2, function()
+      art.rect(cx, cy, cw, ch):color_({ 0.2, 0.1, 0, 0.5 }):corner_radius_(8):layer_(1)
+      art.line_rect(cx, cy, cw, ch):corner_radius_(8):layer_(0.1)
       body(win)
     end)
 

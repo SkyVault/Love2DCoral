@@ -62,6 +62,8 @@ return function(love, enum, sys, tools, camera, pp, vault)
   local pics_3d = {}
   local pics = {}
 
+  local layers = {}
+
   local shader_3d = nil
 
   local scale = v3(1, 1, 1)
@@ -101,9 +103,34 @@ return function(love, enum, sys, tools, camera, pp, vault)
     pop_context(ctx)
   end
 
+  local modf = math.modf
+
   local function add_pic(pic)
     pics[context] = pics[context] or {}
-    table.insert(pics[context], pic)
+
+    function pic:layer_(l)
+      l = l or 0
+
+      if self.index ~= nil then
+        layers[self.layer][self.index] = nil
+      end
+
+      self.layer = l
+      local _,fr = modf(self.layer)
+      if l > 0 and l < 1 then
+        layers["sort"] = layers["sort"] or {}
+        self.index = #layers["sort"]
+        table.insert(layers["sort"], self)
+      elseif fr == 0.0 then
+        layers[l] = layers[l] or {}
+        table.insert(layers[l], self)
+        self.index = #layers[l]
+      end
+      return self
+    end
+
+    pic:layer_(0)
+    return pic
   end
 
   local kinds = enum {
@@ -144,7 +171,6 @@ return function(love, enum, sys, tools, camera, pp, vault)
       corner_radius = 0,
     }
     add_pic(res)
-    layer = layer + 0.001
     return res
   end
 
@@ -293,32 +319,29 @@ return function(love, enum, sys, tools, camera, pp, vault)
     return xx * cam.scale + hw, yy * cam.scale + hh
   end
 
+  local x, draw_pictures = 0, 0
 
-  local x = 0
+  local function draw_layer(vs, cam)
+    if cam then cam:start() end
 
-  local function draw_pictures(pcs)
-    local cam2d = active_camera_2d()
+    for i = 1, #vs do
+      local p = vs[i]
 
-    for ctx, ps in pairs(pcs) do
-      table.sort(ps, function(a, b)
-        return a.layer < b.layer
-      end)
-      for i = 1, #ps do
-
-        local p = ps[i]
+      if p ~= nil then
         kinds.case(p.kind) {
           [kinds.crop] = function()
-            local _pics = pics
-            pics = {}
+            --local _pics = pics
+            --pics = {}
+            local layr = layers[p.layer]
+            layers[p.layer] = {}
+
             if p.callback then p.callback() end
 
-            if cam2d then cam2d:stop() end
             love.graphics.setScissor(p.x, p.y, p.w, p.h)
             draw_pictures(pics)
             love.graphics.setScissor()
-            if cam2d then cam2d:start() end
 
-            pics = _pics
+            layers[p.layer] = layr
           end,
 
           [kinds.line] = function()
@@ -367,6 +390,43 @@ return function(love, enum, sys, tools, camera, pp, vault)
         }
       end
     end
+
+    if cam then cam:stop() end
+  end
+
+  draw_pictures = function(pcs)
+    local cam2d = active_camera_2d()
+
+    local ks = {}
+    for k, _ in pairs(layers) do
+      table.insert(ks, k)
+    end
+
+    table.sort(ks, function(a,b) return tostring(a) < tostring(b) end)
+
+    for _, k in ipairs(ks) do
+      local v = layers[k]
+
+      if k == "sort" then
+        table.sort(v, function(a, b) return a.layer < b.layer end)
+      end
+
+      local cam = cam2d
+
+      if k ~= "sort" and k >= 100 then
+        cam = nil
+        love.graphics.push()
+        love.graphics.translate(0, 0)
+        love.graphics.scale(1)
+        love.graphics.rotate(0)
+      end
+
+      draw_layer(v, cam)
+
+      if k ~= "sort" and k >= 100 then
+        love.graphics.pop()
+      end
+    end
   end
 
   local function final_draw()
@@ -404,13 +464,11 @@ return function(love, enum, sys, tools, camera, pp, vault)
 
     love.graphics.setShader()
 
-    if cam2d then cam2d:start() end
-
     draw_pictures(pics)
 
     love.graphics.setColor(init_color)
-    if cam2d then cam2d:stop() end
 
+    layers = {}
     pics = {}
     pics_3d = {}
     layer = 0

@@ -27,8 +27,8 @@ return function(sys, ui, hash)
   local function draw()
   end
 
-  function watchers:watch(label, value, unique_id)
-    self.xs[unique_id] = {
+  function watchers:watch(value, label)
+    self.xs[label] = {
       value = value,
       label = label,
       width = 0,
@@ -36,16 +36,12 @@ return function(sys, ui, hash)
     }
   end
 
-  function watchers:unwatch(unique_id)
-    watchers.xs[unique_id] = nil
-  end
-
   sys.update(update)
   sys.draw(draw)
 
   return setmetatable(watchers, {
-    __call = function(self, value, uid)
-      watchers:watch("", value, uid)
+    __call = function(self, value, label)
+      watchers:watch(value, label)
     end
   })
 end

@@ -64,12 +64,8 @@ local function _update(dt)
 end
 
 local function _draw()
-  for i = 1, #draws do
-    draws[i].fn()
-  end
-  for i = 1, #ui_draws do
-    ui_draws[i].fn()
-  end
+  for i = 1, #draws    do draws[i].fn() end
+  for i = 1, #ui_draws do ui_draws[i].fn() end
 end
 
 local function keypressed(k)
