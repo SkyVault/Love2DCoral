@@ -7,6 +7,7 @@ return function(love, sys, set)
 
   local function stop_propigation(k)
     blacklist[k] = true
+    keys[k] = nil
   end
 
   local function is_down(k)
