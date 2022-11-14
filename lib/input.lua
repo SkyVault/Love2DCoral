@@ -4,6 +4,10 @@ return function(love, sys, set)
   local mouses = {}
   local mreg = {}
 
+  local function stop_propigation(k)
+    keys[k] = nil
+  end
+
   local function is_down(k)
     local now = love.keyboard.isDown(k)
     keys[k] = now
@@ -61,5 +65,7 @@ return function(love, sys, set)
     is_mouse_down = is_mouse_down,
     is_mouse_pressed = is_mouse_pressed,
     is_mouse_released = is_mouse_released,
+
+    stop_propigation = stop_propigation,
   }
 end

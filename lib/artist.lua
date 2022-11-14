@@ -103,7 +103,7 @@ return function(love, enum, sys, tools, camera, pp, vault)
     pop_context(ctx)
   end
 
-  local modf = math.modf
+  local modf, layer_delta = math.modf, 0
 
   local function add_pic(pic)
     pics[context] = pics[context] or {}
@@ -115,13 +115,15 @@ return function(love, enum, sys, tools, camera, pp, vault)
         layers[self.layer][self.index] = nil
       end
 
-      self.layer = l
       local _,fr = modf(self.layer)
       if l > 0 and l < 1 then
+        self.layer = l + layer_delta
         layers["sort"] = layers["sort"] or {}
         self.index = #layers["sort"]
         table.insert(layers["sort"], self)
+        layer_delta = layer_delta + 0.000001
       elseif fr == 0.0 then
+        self.layer = l
         layers[l] = layers[l] or {}
         table.insert(layers[l], self)
         self.index = #layers[l]
@@ -166,6 +168,7 @@ return function(love, enum, sys, tools, camera, pp, vault)
       x = x, y = y, w = w, h = h,
       rotation = 0,
       color = {1, 1, 1, 1},
+      scale = v2(1, 1),
       layer = layer,
       context = context,
       corner_radius = 0,
@@ -363,17 +366,17 @@ return function(love, enum, sys, tools, camera, pp, vault)
 
           [kinds.circle] = function()
             love.graphics.setColor(p.color)
-            love.graphics.circle("fill", p.x, p.y, p.w)
+            love.graphics.circle("fill", p.x, p.y, p.w / 2)
           end,
 
           [kinds.line_circle] = function()
             love.graphics.setColor(p.color)
-            love.graphics.circle("line", p.x, p.y, p.w)
+            love.graphics.circle("line", p.x, p.y, p.w / 2)
           end,
 
           [kinds.image] = function()
             love.graphics.setColor(p.color)
-            love.graphics.draw(p.image, p.x, p.y)
+            love.graphics.draw(p.image, p.x, p.y, p.rotation, p.scale.x, p.scale.y)
           end,
 
           [kinds.text] = function()
@@ -403,28 +406,43 @@ return function(love, enum, sys, tools, camera, pp, vault)
     end
 
     table.sort(ks, function(a,b) return tostring(a) < tostring(b) end)
+    for _, k in ipairs(ks) do
+      if k ~= "sort" then
+        if k > 0 then break end
+        local v = layers[k]
+        draw_layer(v, cam2d)
+      end
+    end
+
+    for _, k in ipairs(ks) do
+      if k == "sort" then
+        local v = layers[k]
+        table.sort(v, function(a, b)
+          return a.layer < b.layer
+        end)
+        draw_layer(v, cam2d)
+      end
+    end
 
     for _, k in ipairs(ks) do
       local v = layers[k]
 
-      if k == "sort" then
-        table.sort(v, function(a, b) return a.layer < b.layer end)
-      end
+      if k ~= "sort" and k >= 1 then
+        local cam = cam2d
 
-      local cam = cam2d
+        if k >= 100 then
+          cam = nil
+          love.graphics.push()
+          love.graphics.translate(0, 0)
+          love.graphics.scale(1)
+          love.graphics.rotate(0)
+        end
 
-      if k ~= "sort" and k >= 100 then
-        cam = nil
-        love.graphics.push()
-        love.graphics.translate(0, 0)
-        love.graphics.scale(1)
-        love.graphics.rotate(0)
-      end
+        draw_layer(v, cam)
 
-      draw_layer(v, cam)
-
-      if k ~= "sort" and k >= 100 then
-        love.graphics.pop()
+        if k >= 100 then
+          love.graphics.pop()
+        end
       end
     end
   end
@@ -468,6 +486,7 @@ return function(love, enum, sys, tools, camera, pp, vault)
 
     love.graphics.setColor(init_color)
 
+    layer_delta = 0
     layers = {}
     pics = {}
     pics_3d = {}

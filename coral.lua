@@ -46,6 +46,8 @@ return function(love)
     local tween = _require("lib.tweens")(sys, tools)
     local assets = _require("lib.assets")(love)
 
+    local events = _require("lib.events")()
+
     return vault.table("Coral") {
       vault = vault,
       palette = palette,
@@ -61,6 +63,8 @@ return function(love)
       tween = tween,
       assets = assets,
       watch = watch,
+
+      ev = events,
 
       base_path = base_path,
 
