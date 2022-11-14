@@ -1,14 +1,16 @@
 return function(love, sys, set)
   local keys = {}
+  local blacklist = {}
   local reg = {}
   local mouses = {}
   local mreg = {}
 
   local function stop_propigation(k)
-    keys[k] = nil
+    blacklist[k] = true
   end
 
   local function is_down(k)
+    if blacklist[k] ~= nil then return false end
     local now = love.keyboard.isDown(k)
     keys[k] = now
     return now
@@ -21,11 +23,13 @@ return function(love, sys, set)
   end
 
   local function is_pressed(k)
+    if blacklist[k] ~= nil then return false end
     local now, last = love.keyboard.isDown(k), keys[k]
     return now and not last
   end
 
   local function is_released(k)
+    if blacklist[k] ~= nil then return false end
     local now, last = love.keyboard.isDown(k), keys[k]
     return not now and last
   end
@@ -45,6 +49,9 @@ return function(love, sys, set)
   end
 
   sys.update(function()
+  end, 9999)
+
+  sys.ui_draw(function()
     for i = 1, 3 do
       mouses[i] = mouses[i] == nil and false or love.mouse.isDown(i)
     end
@@ -52,6 +59,8 @@ return function(love, sys, set)
     for k, v in pairs(reg) do
       keys[k] = love.keyboard.isDown(k)
     end
+
+    blacklist = {}
   end, 9999)
 
   sys.keypressed(function(k) reg[k] = true end)
