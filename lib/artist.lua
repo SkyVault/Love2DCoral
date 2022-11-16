@@ -103,7 +103,7 @@ return function(love, enum, sys, tools, camera, pp, vault)
     pop_context(ctx)
   end
 
-  local modf, layer_delta = math.modf, 0
+  local modf, layer_delta, uilayer_delta = math.modf, 0, 0
 
   local function add_pic(pic)
     pics[context] = pics[context] or {}
@@ -115,8 +115,14 @@ return function(love, enum, sys, tools, camera, pp, vault)
         layers[self.layer][self.index] = nil
       end
 
-      local _,fr = modf(self.layer)
-      if l > 0 and l < 1 then
+      local _,fr = modf(l)
+      if fr ~= 0.0 and l < 0.0 and l > -1.0 then
+        self.layer = l + uilayer_delta
+        layers["uisort"] = layers["uisort"] or {}
+        self.index = #layers["uisort"]
+        table.insert(layers["uisort"], self)
+        uilayer_delta = uilayer_delta + 0.000001
+      elseif fr ~= 0.0 then
         self.layer = l + layer_delta
         layers["sort"] = layers["sort"] or {}
         self.index = #layers["sort"]
@@ -407,10 +413,25 @@ return function(love, enum, sys, tools, camera, pp, vault)
 
     table.sort(ks, function(a,b) return tostring(a) < tostring(b) end)
     for _, k in ipairs(ks) do
-      if k ~= "sort" then
+      if k ~= "sort" and k ~= "uisort" then
         if k > 0 then break end
         local v = layers[k]
         draw_layer(v, cam2d)
+      end
+    end
+
+    for _, k in ipairs(ks) do
+      local v = layers[k]
+
+      if k ~= "sort" and k ~= "uisort" and k >= 1 then
+        love.graphics.push()
+        love.graphics.translate(0, 0)
+        love.graphics.scale(1)
+        love.graphics.rotate(0)
+
+        draw_layer(v, nil)
+
+        love.graphics.pop()
       end
     end
 
@@ -425,24 +446,12 @@ return function(love, enum, sys, tools, camera, pp, vault)
     end
 
     for _, k in ipairs(ks) do
-      local v = layers[k]
-
-      if k ~= "sort" and k >= 1 then
-        local cam = cam2d
-
-        if k >= 100 then
-          cam = nil
-          love.graphics.push()
-          love.graphics.translate(0, 0)
-          love.graphics.scale(1)
-          love.graphics.rotate(0)
-        end
-
-        draw_layer(v, cam)
-
-        if k >= 100 then
-          love.graphics.pop()
-        end
+      if k == "uisort" then
+        local v = layers[k]
+        table.sort(v, function(a, b)
+          return a.layer < b.layer
+        end)
+        draw_layer(v, nil)
       end
     end
   end
@@ -487,6 +496,7 @@ return function(love, enum, sys, tools, camera, pp, vault)
     love.graphics.setColor(init_color)
 
     layer_delta = 0
+    uilayer_delta = 0
     layers = {}
     pics = {}
     pics_3d = {}
