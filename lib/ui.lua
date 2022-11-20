@@ -112,7 +112,7 @@ return function(base_path, love, sys, art, tools, input, vault, palette)
   end
 
   function ui:panel(width, height)
-    art.rect(self.cursor.x, self.cursor.y, width, height):color_(self.theme.bg_color):layer_(100)
+    art.rect(self.cursor.x, self.cursor.y, width, height):color_(self.theme.bg_color):layer_(-0.5)
   end
 
   function ui:rpanel(width, height, title)
@@ -121,7 +121,7 @@ return function(base_path, love, sys, art, tools, input, vault, palette)
       art.rect(self.cursor.x, self.cursor.y + 6, w + ui.theme.margin * 2, h + height - 12 + 4)
         :color_({ 0.2, 0.3, 0.4, 1.0 })
         :corner_radius_(8)
-        :layer_(100)
+        :layer_(-0.5)
 
       art.text(
         title,
@@ -130,14 +130,14 @@ return function(base_path, love, sys, art, tools, input, vault, palette)
         self.cursor.y + 6
       )
       :color_(ui.theme.text_color)
-      :layer_(100)
+      :layer_(-0.5)
       self.cursor.y = self.cursor.y + h
     end
 
     art.rect(self.cursor.x, self.cursor.y, width, height)
       :color_(self.theme.bg_color)
       :corner_radius_(8)
-      :layer_(100)
+      :layer_(-0.5)
   end
 
   function ui:paragraph(text)
@@ -146,15 +146,15 @@ return function(base_path, love, sys, art, tools, input, vault, palette)
   function ui:label(text)
     local fnt, w, h = self.theme.font, self:measure_text(text)
     ui:next_size(w, h)
-    art.text(text, self.theme.font, self.cursor.x, self.cursor.y):color_(ui.theme.text_color):layer_(110)
+    art.text(text, self.theme.font, self.cursor.x, self.cursor.y):color_(ui.theme.text_color):layer_(-0.5)
     self:move_cursor(w, h)
   end
 
   function ui:title(text)
     local fnt, w, h = self.theme.title_font, self:measure_title(text)
     self:newline()
-    art.text(text, self.theme.title_font, self.cursor.x, self.cursor.y + 4):color_(Black):layer_(110)
-    art.text(text, self.theme.title_font, self.cursor.x, self.cursor.y):color_(Tan):layer_(110)
+    art.text(text, self.theme.title_font, self.cursor.x, self.cursor.y + 4):color_(Black):layer_(-0.5)
+    art.text(text, self.theme.title_font, self.cursor.x, self.cursor.y):color_(Tan):layer_(-0.5)
     self:newline(h)
   end
 
@@ -163,7 +163,7 @@ return function(base_path, love, sys, art, tools, input, vault, palette)
     local p = self.theme.padding
     local h = 6
     self:newline()
-    art.rect(x + p, self.cursor.y - h + 2, w - p * 2, 2):color_(DarkGray):layer_(110)
+    art.rect(x + p, self.cursor.y - h + 2, w - p * 2, 2):color_(DarkGray):layer_(-0.5)
   end
 
   function ui:newline(height)
@@ -179,10 +179,10 @@ return function(base_path, love, sys, art, tools, input, vault, palette)
     ui:window(label, 400, 300, 200, 200, function(win)
       art.paragraph(str, font, win.x, win.y, win.w, "left")
         :color_(Orange)
-        :layer_(200)
+        :layer_(-0.5)
       art.paragraph(str, font, win.x, win.y, win.w, "left")
         :color_(ui.theme.text_color)
-        :layer_(200)
+        :layer_(-0.5)
     end)
   end
 
@@ -202,22 +202,22 @@ return function(base_path, love, sys, art, tools, input, vault, palette)
       local fg = hot and Maroon or ui.theme.text_color
       art.text(
         text, fnt, self.cursor.x + self.theme.padding / 2, self.cursor.y + self.theme.padding / 2
-      ):color_(fg):layer_(111)
-      art.rect(self.cursor.x, self.cursor.y + h - 2, w, 2):color_(fg):layer_(110)
+      ):color_(fg):layer_(-0.5)
+      art.rect(self.cursor.x, self.cursor.y + h - 2, w, 2):color_(fg):layer_(-0.5)
     else
       art.rect(self.cursor.x, self.cursor.y, w, h)
         :color_(self.theme.bg_color)
         :corner_radius_(4)
-        :layer_(110)
+        :layer_(-0.5)
 
       art.line_rect(self.cursor.x, self.cursor.y, w, h)
         :color_(self.theme.fg_color)
         :corner_radius_(4)
-        :layer_(111)
+        :layer_(-0.5)
 
       art.text(
         text, fnt, self.cursor.x + self.theme.padding / 2, self.cursor.y + self.theme.padding / 2
-      ):color_(ui.theme.text_color):layer_(111)
+      ):color_(ui.theme.text_color):layer_(-0.5)
     end
 
     self:move_cursor(w, h)
@@ -240,12 +240,12 @@ return function(base_path, love, sys, art, tools, input, vault, palette)
     if checked then ui.theme.bg_color = { 0.4, 0.4, 0.85, 0.99 } end
 
     self:next_size(w, h)
-    art.rect(self.cursor.x + 4, self.cursor.y + 4, w, h):color_(Black):layer_(110)
-    art.rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.bg_color):layer_(110)
-    art.line_rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.fg_color):layer_(111)
+    art.rect(self.cursor.x + 4, self.cursor.y + 4, w, h):color_(Black):layer_(-0.5)
+    art.rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.bg_color):layer_(-0.5)
+    art.line_rect(self.cursor.x, self.cursor.y, w, h):color_(self.theme.fg_color):layer_(-0.5)
     self:move_cursor(w, h)
 
-    art.text(text, fnt, ox + self.theme.padding / 2, oy + self.theme.padding / 2):color_(ui.theme.text_color):layer_(111)
+    art.text(text, fnt, ox + self.theme.padding / 2, oy + self.theme.padding / 2):color_(ui.theme.text_color):layer_(-0.5)
 
     if hot or checked then ui.theme.bg_color = old end
 
@@ -292,7 +292,7 @@ return function(base_path, love, sys, art, tools, input, vault, palette)
       art.rect(xx, yy, 128 + 32, 128 + 64)
         :corner_radius_(6)
         :color_({ 1, 1, 1, 0.8 })
-        :layer_(110)
+        :layer_(-0.5)
 
       local th = ui.theme
 
@@ -366,8 +366,8 @@ return function(base_path, love, sys, art, tools, input, vault, palette)
     end
 
     art.crop(cx, cy, cw + 2, ch + 2, function()
-      art.rect(cx, cy, cw, ch):color_({ 0.2, 0.1, 0, 0.5 }):corner_radius_(8):layer_(1)
-      art.line_rect(cx, cy, cw, ch):corner_radius_(8):layer_(0.1)
+      art.rect(cx, cy, cw, ch):color_({ 0.2, 0.1, 0, 0.5 }):corner_radius_(8):layer_(-0.5)
+      art.line_rect(cx, cy, cw, ch):corner_radius_(8):layer_(-0.5)
       body(win)
     end)
 

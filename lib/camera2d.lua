@@ -29,6 +29,27 @@ return function(love, vault)
       love.graphics.rotate(self.rotation)
     end,
 
+    left = function(self)
+      return -self.position.x - love.graphics.getWidth()/2
+    end,
+
+    right = function(self)
+      return -self.position.x + love.graphics.getWidth()/2
+    end,
+
+    top = function(self)
+      return -self.position.y - love.graphics.getHeight()/2
+    end,
+
+    bottom = function(self)
+      return -self.position.y + love.graphics.getHeight()/2
+    end,
+
+    in_bounds = function(self, x, y, w, h)
+      return x > self:left() and x + w < self:right() and
+        y > self:top() and y + h < self:bottom()
+    end,
+
     stop = function(self)
       love.graphics.pop()
     end,
